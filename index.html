@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-	<!-- 在<head>中添加 -->
+    <!-- 在<head>中添加 -->
 <script>
 // 防调试保护
 setInterval(function(){
@@ -693,6 +693,53 @@ document.onkeydown = function(e) {
             opacity: 0.7;
         }
         
+        /* === 模组行高亮样式 - 根据状态 === */
+        .row-highlight-updated {
+            background-color: rgba(59, 130, 246, 0.15) !important;
+            border-left: 4px solid var(--info);
+        }
+        
+        .row-highlight-new {
+            background-color: rgba(16, 185, 129, 0.15) !important;
+            border-left: 4px solid var(--success);
+        }
+        
+        .row-highlight-moved {
+            background-color: rgba(245, 158, 11, 0.15) !important;
+            border-left: 4px solid var(--warning);
+        }
+        
+        .light-mode .row-highlight-updated {
+            background-color: rgba(59, 130, 246, 0.1) !important;
+        }
+        
+        .light-mode .row-highlight-new {
+            background-color: rgba(16, 185, 129, 0.1) !important;
+        }
+        
+        .light-mode .row-highlight-moved {
+            background-color: rgba(245, 158, 11, 0.1) !important;
+        }
+        
+        /* 行高亮悬停效果 */
+        .mods-table tbody tr.row-highlight-updated:hover {
+            background-color: rgba(59, 130, 246, 0.25) !important;
+        }
+        
+        .mods-table tbody tr.row-highlight-new:hover {
+            background-color: rgba(16, 185, 129, 0.25) !important;
+        }
+        
+        .mods-table tbody tr.row-highlight-moved:hover {
+            background-color: rgba(245, 158, 11, 0.25) !important;
+        }
+        
+        /* 如果有多个状态，使用叠加渐变效果 */
+        .mods-table tbody tr[class*="row-highlight"] {
+            background-blend-mode: overlay;
+        }
+        /* ================================ */
+        
         /* 页脚 */
         .footer {
             text-align: center;
@@ -905,6 +952,119 @@ document.onkeydown = function(e) {
                 justify-content: center;
             }
         }
+
+        /* ---------- 新增：自由拖拽缩放弹窗样式 ---------- */
+        .status-dialog {
+            position: fixed;
+            top: 100px;
+            left: 100px;
+            width: 380px;
+            height: 450px;
+            background: var(--dark-light);
+            border: 2px solid var(--primary);
+            border-radius: 16px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            resize: both;
+            overflow: hidden;
+            min-width: 260px;
+            min-height: 220px;
+            color: var(--light);
+        }
+        .light-mode .status-dialog {
+            background: white;
+            color: #333;
+            border-color: var(--primary);
+        }
+        .dialog-header {
+            background: linear-gradient(145deg, var(--dark), #0f172a);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: move;
+            user-select: none;
+            border-bottom: 1px solid var(--primary);
+        }
+        .light-mode .dialog-header {
+            background: linear-gradient(145deg, #e2e8f0, #cbd5e1);
+            color: #1e293b;
+        }
+        .dialog-title {
+            font-weight: 600;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .dialog-close {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: var(--light);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .light-mode .dialog-close {
+            color: #1e293b;
+            background: rgba(0,0,0,0.05);
+        }
+        .dialog-close:hover {
+            background: var(--danger);
+            color: white;
+        }
+        .dialog-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .dialog-item {
+            background: rgba(255,149,0,0.08);
+            padding: 10px 14px;
+            border-radius: 10px;
+            border-left: 5px solid var(--primary);
+            cursor: pointer;
+            transition: 0.2s;
+            word-break: break-word;
+        }
+        .dialog-item:hover {
+            background: rgba(255,149,0,0.2);
+            transform: translateX(5px);
+        }
+        .light-mode .dialog-item {
+            background: rgba(255,149,0,0.05);
+        }
+        .dialog-item .mod-name {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        .dialog-resize-handle {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 20px;
+            height: 20px;
+            cursor: se-resize;
+            background: linear-gradient(135deg, transparent 70%, var(--primary) 100%);
+            border-bottom-right-radius: 14px;
+        }
+        /* 遮罩层用于弹窗拖拽时防止选中 */
+        .dragging {
+            user-select: none;
+            pointer-events: none;
+        }
+        .dragging .dialog-header {
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -917,7 +1077,7 @@ document.onkeydown = function(e) {
             <h1 class="title">欧洲卡车模拟2-组合地图-1.57</h1>
             <div class="subtitle">
                 <span><i class="fas fa-user"></i> ✨作者：瑆泽、初一爱笑啊、BGYdook✨</span>
-                <span><i class="far fa-calendar-alt"></i> ✨更新日期：2026年02月11日（数据导入时间：2026-02-11 13:32:48）✨</span>
+                <span><i class="far fa-calendar-alt"></i> ✨更新日期：2026年02月12日（数据导入时间：2026-02-12 08:51:29）✨</span>
             </div>
             
             <!-- 语言选择器 -->
@@ -1053,13 +1213,16 @@ document.onkeydown = function(e) {
         </button>
     </div>
 
+    <!-- 弹窗将动态添加到此处 -->
+    <div id="dialogContainer"></div>
+
     <script>
         // 多语言文本
         const translations = {
             'zh-CN': {
                 title: '欧洲卡车模拟2-组合地图-1.57',
                 subtitleAuthor: '作者：瑆泽、初一爱笑啊、BGYdook',
-                subtitleDate: '更新日期：2026年02月11日',
+                subtitleDate: '更新日期：2026年02月12日',
                 searchPlaceholder: '搜索模组名或状态...',
                 downloadAll: '一键下载全部模组',
                 archive: '免排序存档',
@@ -1089,7 +1252,7 @@ document.onkeydown = function(e) {
             'en': {
                 title: '欧洲卡车模拟2-组合地图-1.57',
                 subtitleAuthor: '作者：瑆泽、初一爱笑啊、BGYdook',
-                subtitleDate: 'Update Date: 2026-02-11',
+                subtitleDate: 'Update Date: 2026-02-12',
                 searchPlaceholder: 'Search mod name or status...',
                 downloadAll: 'Download All Mods',
                 archive: 'No-Sort Archive',
@@ -1119,7 +1282,7 @@ document.onkeydown = function(e) {
             'ru': {
                 title: '欧洲卡车模拟2-组合地图-1.57',
                 subtitleAuthor: '作者：瑆泽、初一爱笑啊、BGYdook',
-                subtitleDate: 'Дата обновления: 2026-02-11',
+                subtitleDate: 'Дата обновления: 2026-02-12',
                 searchPlaceholder: 'Поиск по названию мода или статусу...',
                 downloadAll: 'Скачать все моды',
                 archive: 'Архив без сортировки',
@@ -1149,7 +1312,7 @@ document.onkeydown = function(e) {
             'ko': {
                 title: '欧洲卡车模拟2-组合地图-1.57',
                 subtitleAuthor: '作者：瑆泽、初一爱笑啊、BGYdook',
-                subtitleDate: '업데이트 날짜: 2026-02-11',
+                subtitleDate: '업데이트 날짜: 2026-02-12',
                 searchPlaceholder: '모드 이름 또는 상태 검색...',
                 downloadAll: '모든 모드 다운로드',
                 archive: '정렬 없음 아카이브',
@@ -1179,7 +1342,7 @@ document.onkeydown = function(e) {
             'ja': {
                 title: '欧洲卡车模拟2-组合地图-1.57',
                 subtitleAuthor: '作者：瑆泽、初一爱笑啊、BGYdook',
-                subtitleDate: '更新日：2026-02-11',
+                subtitleDate: '更新日：2026-02-12',
                 searchPlaceholder: 'モッド名またはステータスを検索...',
                 downloadAll: 'すべてのモッドをダウンロード',
                 archive: 'ソート不要アーカイブ',
@@ -1209,7 +1372,7 @@ document.onkeydown = function(e) {
             'de': {
                 title: '欧洲卡车模拟2-组合地图-1.57',
                 subtitleAuthor: '作者：瑆泽、初一爱笑啊、BGYdook',
-                subtitleDate: 'Aktualisierungsdatum: 2026-02-11',
+                subtitleDate: 'Aktualisierungsdatum: 2026-02-12',
                 searchPlaceholder: 'Mod-Namen oder Status suchen...',
                 downloadAll: 'Alle Mods herunterladen',
                 archive: 'Sortierfreies Archiv',
@@ -1239,7 +1402,7 @@ document.onkeydown = function(e) {
             'fr': {
                 title: '欧洲卡车模拟2-组合地图-1.57',
                 subtitleAuthor: '作者：瑆泽、初一爱笑啊、BGYdook',
-                subtitleDate: 'Date de mise à jour : 2026-02-11',
+                subtitleDate: 'Date de mise à jour : 2026-02-12',
                 searchPlaceholder: 'Rechercher un mod ou un statut...',
                 downloadAll: 'Télécharger tous les mods',
                 archive: 'Archive sans tri',
@@ -1269,7 +1432,7 @@ document.onkeydown = function(e) {
         };
 
         // 模组数据
-                                                                                                                                                                                        const modsData = [
+                                                                                                                                                                                                        const modsData = [
   {
     "id": 1,
     "name": "ETS2 Global Background Map-Grand Utopia+",
@@ -1477,8 +1640,10 @@ document.onkeydown = function(e) {
     "name": "Map FIX",
     "fileName": "Map FIX.zip",
     "version": "latest",
-    "status": [],
-    "downloadUrl": "https://pan.quark.cn/s/ff3fe17eed13",
+    "status": [
+      "updated"
+    ],
+    "downloadUrl": "https://pan.quark.cn/s/7042f3a022e4",
     "downloadCount": 0
   },
   {
@@ -1519,6 +1684,17 @@ document.onkeydown = function(e) {
   },
   {
     "id": 28,
+    "name": "More European Cities - Sud De France FIX",
+    "fileName": "More European Cities - Sud De France FIX.scs",
+    "version": "latest",
+    "status": [
+      "new"
+    ],
+    "downloadUrl": "https://pan.quark.cn/s/9b2488b8d054",
+    "downloadCount": 0
+  },
+  {
+    "id": 29,
     "name": "More European Cities(Switzerland)",
     "fileName": "More European Cities(Switzerland - 1.1).scs",
     "version": "latest(1.1)",
@@ -1527,7 +1703,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 29,
+    "id": 30,
     "name": "Grand Utopia EurAfrica Fix",
     "fileName": "gmc.grand_utopia.eurafrica.fix.csc",
     "version": "latest(1.0.0)",
@@ -1538,7 +1714,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 30,
+    "id": 31,
     "name": "European Grand Utopia - European DreamLand FIX",
     "fileName": "Eu_Dreamland_-_Eu_Grand_Utopia_FIX.scs",
     "version": "latest(1.0)",
@@ -1547,7 +1723,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 31,
+    "id": 32,
     "name": "European Grand Utopia for Promods",
     "fileName": "European Grand Utopia for Promods v1.7 by Adyox",
     "version": "latest(1.7)",
@@ -1556,7 +1732,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 32,
+    "id": 33,
     "name": "European Grand Utopia",
     "fileName": "European Grand Utopia v1.7 by Adyox",
     "version": "latest(1.7)",
@@ -1565,7 +1741,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 33,
+    "id": 34,
     "name": "Koromyslovo Add-on - Russian Open Spaces RC",
     "fileName": "Koromyslovo add-on - ROS RC.scs",
     "version": "latest(1.0)",
@@ -1574,7 +1750,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 34,
+    "id": 35,
     "name": "Koromyslovo Add-on",
     "fileName": "Koromyslovo add-on for Project Russia 1.4.scs",
     "version": "latest(1.4)",
@@ -1583,7 +1759,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 35,
+    "id": 36,
     "name": "Russian Open Spaces Map Combo RC&FIX(Kirov PAID Ver.)",
     "fileName": "ROS - Map Combo RC&FIX(Kirov PAID Ver.).scs",
     "version": "latest(1.5)",
@@ -1592,7 +1768,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 36,
+    "id": 37,
     "name": "Ural Map - Russian Federation Extended RC",
     "fileName": "rxx.ural_mrm_rc.scs",
     "version": "latest(1.1)",
@@ -1601,7 +1777,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 37,
+    "id": 38,
     "name": "Ural Map 1.7",
     "fileName": "uralmap17.scs",
     "version": "latest(1.7)",
@@ -1610,7 +1786,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 38,
+    "id": 39,
     "name": "Project M11 - VK Rusmap Merge",
     "fileName": "Project M11 - VK Rusmap Merge.scs",
     "version": "latest(1.0.2)",
@@ -1619,7 +1795,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 39,
+    "id": 40,
     "name": "M11 highway for RusMapVK v1.4",
     "fileName": "m11rusmapvk.scs",
     "version": "latest(1.4)",
@@ -1628,7 +1804,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 40,
+    "id": 41,
     "name": "RusCentry Map - Kirov Map - SibirMap RC",
     "fileName": "RusCentry Map - Kirov Map - SibirMap RC.scs",
     "version": "latest(1.4)",
@@ -1637,7 +1813,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 41,
+    "id": 42,
     "name": "RusCentryMap",
     "fileName": "RusCentryMap.scs",
     "version": "latest(1.8)",
@@ -1646,7 +1822,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 42,
+    "id": 43,
     "name": "Ulyanovsk Map 1.0",
     "fileName": "ulmap10.scs",
     "version": "latest(1.0)",
@@ -1657,7 +1833,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 43,
+    "id": 44,
     "name": "RcNNmapxM12",
     "fileName": "RCNNMapM12.scs",
     "version": "latest(1.1)",
@@ -1666,7 +1842,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 44,
+    "id": 45,
     "name": "M12 SibirMap 2.10.2 RC",
     "fileName": "M12_Sibirmap_rc.scs",
     "version": "latest(1.0)",
@@ -1675,7 +1851,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 45,
+    "id": 46,
     "name": "M12_Vostok_V3.0",
     "fileName": "M12_Vostok_V3.0.scs",
     "version": "latest(3.0)",
@@ -1684,7 +1860,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 46,
+    "id": 47,
     "name": "Bor Addon for Rusmap",
     "fileName": "Bor addon for vk rusmap.scs",
     "version": "latest(1.3)",
@@ -1693,7 +1869,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 47,
+    "id": 48,
     "name": "Ghost Road FIX For Project Russia",
     "fileName": "Ghost Road FIX Project Russia.scs",
     "version": "latest(1.57-1.2.0)",
@@ -1702,7 +1878,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 48,
+    "id": 49,
     "name": "Central Russia - Project Russia - Project Chernozemye - Roextended RC",
     "fileName": "rxx.rx.ctr_cher_pru_roex.scs",
     "version": "latest(1.55-1.0)",
@@ -1711,7 +1887,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 49,
+    "id": 50,
     "name": "Project Chernozemye - Donbass - Roextended RC",
     "fileName": "P.Cher - Donbass - Roex RC.scs",
     "version": "latest(1.57-2.1.3)",
@@ -1722,7 +1898,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 50,
+    "id": 51,
     "name": "Project Russia 5.6.3 & Central Russia 1.2 FIX(FIX 1.3)",
     "fileName": "PRandCRfix",
     "version": "latest",
@@ -1731,7 +1907,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 51,
+    "id": 52,
     "name": "Project Russia 5.6.3 & Central Russia 1.2 FIX",
     "fileName": "Project Russia 5.6.3 & Central Russia 1.2 FIX.scs",
     "version": "latest(1.0)",
@@ -1740,7 +1916,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 52,
+    "id": 53,
     "name": "Project Saratov 1.1",
     "fileName": "projectsaratov113.scs",
     "version": "latest(1.1.3)",
@@ -1749,7 +1925,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 53,
+    "id": 54,
     "name": "Luhansk - Verkhniy Mamon RC(Chzm-Db RC Addon)",
     "fileName": "Luhansk - Verkhniy Mamon RC(Chzm-Db RC Addon).scs",
     "version": "latest(1.0)",
@@ -1760,7 +1936,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 54,
+    "id": 55,
     "name": "Project Chernozemye -DonbassMap RC",
     "fileName": "Project Chernozemye - DonbassMap Official RC",
     "version": "latest(2.1.1)",
@@ -1769,7 +1945,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 55,
+    "id": 56,
     "name": "Chernozemye - Project Russia RC",
     "fileName": "Project Chernozemye - Project Russia Official RC",
     "version": "latest(2.1.1)",
@@ -1778,7 +1954,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 56,
+    "id": 57,
     "name": "Project Chernozemye 2.1.3",
     "fileName": "Project Chernozemye 2.1.3.scs",
     "version": "latest(2.1.3)",
@@ -1787,7 +1963,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 57,
+    "id": 58,
     "name": "Project Russia",
     "fileName": "ProjectRussia.scs",
     "version": "not latest(5.6.3)",
@@ -1796,7 +1972,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 58,
+    "id": 59,
     "name": "Central Russia",
     "fileName": "Project_Central_Russia.scs",
     "version": "latest(1.2)",
@@ -1805,7 +1981,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 59,
+    "id": 60,
     "name": "RussiaFederation Extended SibirMap RC",
     "fileName": "rfex_connector_sibirmap.scs",
     "version": "latest(1.0)",
@@ -1814,7 +1990,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 60,
+    "id": 61,
     "name": "RussiaFederation Extended x NNMap RC",
     "fileName": "rfex_connector_nnmap.scs",
     "version": "latest(1.1)",
@@ -1823,7 +1999,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 61,
+    "id": 62,
     "name": "Russian Federation Extended",
     "fileName": "Russian_federation_extended.scs",
     "version": "latest(5.0)",
@@ -1832,7 +2008,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 62,
+    "id": 63,
     "name": "NNMap 1.3.0",
     "fileName": "nnmap130.scs",
     "version": "latest(1.3)",
@@ -1841,7 +2017,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 63,
+    "id": 64,
     "name": "Northern Russia Regions 1.57 v0.3 PAID",
     "fileName": "Northern_Russia_Regions 1.57 v.0.3 PAID.scs",
     "version": "latest(0.3b)",
@@ -1850,7 +2026,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 64,
+    "id": 65,
     "name": "KirovMap 1.7.3(1.57)",
     "fileName": "Kirovmap173_157.scs",
     "version": "latest(1.7.3)",
@@ -1859,7 +2035,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 65,
+    "id": 66,
     "name": "RoEX - Donbass - Promods RC",
     "fileName": "RoEX - Donbass - Promods - BXP Moldova RC.scs",
     "version": "latest(1.0.2)",
@@ -1870,7 +2046,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 66,
+    "id": 67,
     "name": "RoExtended - BXP Moldova - Carpathian Addon RC(Requires Ukraine Expansion)",
     "fileName": "RoExtended - Carpathian Addon - BXP Moldova RC(Requires Ukraine Expansion).scs",
     "version": "latest(1.2)",
@@ -1879,7 +2055,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 67,
+    "id": 68,
     "name": "BXP PM Moldova 157",
     "fileName": "BXPpmMoldova157.scs",
     "version": "latest(157.0)",
@@ -1888,7 +2064,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 68,
+    "id": 69,
     "name": "Ukraine Expansion - Carpathian Addon RC",
     "fileName": "Ukraine Expansion - Carpathian Addon RC.scs",
     "version": "latest(1.3_poludniowa)",
@@ -1897,7 +2073,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 69,
+    "id": 70,
     "name": "Ukraine Expansion - Poland Rebuilding (Potudniowa Compatible) RC",
     "fileName": "Ukraine Expansion - Poland Rebuilding (Południowa Compatible) RC.scs",
     "version": "latest(1.3_poludniowa)",
@@ -1906,7 +2082,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 70,
+    "id": 71,
     "name": "Slovensko+ - Ukraine Expansion RC",
     "fileName": "Slovensko+_-_Ukraine_Expansion_RC.scs",
     "version": "latest(1.3)",
@@ -1915,7 +2091,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 71,
+    "id": 72,
     "name": "Ukraine Expension - RoExtended RC",
     "fileName": "ukrexp_-_ROEX_RC.scs",
     "version": "latest(1.55-1.1)",
@@ -1924,7 +2100,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 72,
+    "id": 73,
     "name": "Ukraine Expansion FIX",
     "fileName": "Ukraine Expansion FIX.scs",
     "version": "latest(1.3_poludniowa)",
@@ -1933,7 +2109,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 73,
+    "id": 74,
     "name": "Ukraine Expansion",
     "fileName": "Ukraine_Expansion_v0.13.scs",
     "version": "latest(0.13)",
@@ -1942,7 +2118,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 74,
+    "id": 75,
     "name": "Carpathian Addon FIX",
     "fileName": "Carpathian Addon FIX.scs",
     "version": "latest(1.9)",
@@ -1951,7 +2127,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 75,
+    "id": 76,
     "name": "Carpathian Promods Addon",
     "fileName": "zCarpathian_Add-on_Promods_2.65.scs",
     "version": "latest(0.5.1)",
@@ -1960,7 +2136,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 76,
+    "id": 77,
     "name": "Projeckt Cesko - Silesia - Slovensko+ RC(Poludniowa Polska Ver.)",
     "fileName": "Projekt Cesko - Silesia - Slovensko+ RC(Poludniowa Ver).scs",
     "version": "latest(1.1)",
@@ -1969,7 +2145,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 77,
+    "id": 78,
     "name": "PM - RM - PR RC / Promods Roads and Cities Merge Copatibility",
     "fileName": "ProMods_road_and_cities_RusMap_Fix.scs",
     "version": "latest(1.7_merge1)",
@@ -1980,7 +2156,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 78,
+    "id": 79,
     "name": "Centarl Poland Fix",
     "fileName": "gmc.central_poland.fix.scs",
     "version": "latest(1.57-1.0.0)",
@@ -1989,7 +2165,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 79,
+    "id": 80,
     "name": "Silesia - Centralna Polska - Poludniowa Polska RC + Merge",
     "fileName": "zzzz_silesia_poludniowa_centralna_merge_rc.scs",
     "version": "latest(1.57)",
@@ -2000,7 +2176,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 80,
+    "id": 81,
     "name": "Silesia - Centralna Polska Road Connection",
     "fileName": "silesia_centralna_polska_rc",
     "version": "latest(1.57)",
@@ -2011,7 +2187,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 81,
+    "id": 82,
     "name": "Central Poland-Def",
     "fileName": "zz1_def.scs",
     "version": "latest(1.0)",
@@ -2020,7 +2196,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 82,
+    "id": 83,
     "name": "Central Poland-Models",
     "fileName": "zz3_modele.scs",
     "version": "latest(1.0)",
@@ -2029,7 +2205,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 83,
+    "id": 84,
     "name": "Central Poland-Assets",
     "fileName": "zz2_assets.scs",
     "version": "latest(1.0)",
@@ -2038,7 +2214,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 84,
+    "id": 85,
     "name": "Silesia - Poludniowa Polska Road Connection + Merge",
     "fileName": "zzzz_silesia_poludniowa_polska_merge_rc.scs",
     "version": "latest(1.57.1)",
@@ -2047,7 +2223,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 85,
+    "id": 86,
     "name": "Projekt Cesko - Promods - Poland Rebuilding RC",
     "fileName": "Projekt Česko - ProMods - Poland Rebuilding RC.scs",
     "version": "latest(1.5)",
@@ -2056,7 +2232,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 86,
+    "id": 87,
     "name": "Promods road and cities Silesia 1.7.2.1 merge",
     "fileName": "zz_ProMods_road_and_cities_Silesia_merge.scs",
     "version": "latest(1.7.2_2)",
@@ -2067,7 +2243,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 87,
+    "id": 88,
     "name": "Cesko-Poland Rebuild-Silesia RC",
     "fileName": "rxx.rc.ck_pl_sl.scs",
     "version": "latest(1.55-1.0)",
@@ -2076,7 +2252,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 88,
+    "id": 89,
     "name": "silesia",
     "fileName": "silesia_PR_172_1.scs",
     "version": "latest(1.7.2_1)",
@@ -2085,7 +2261,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 89,
+    "id": 90,
     "name": "Projekt Cesko - Slovensko+ RC",
     "fileName": "Projekt Česko - Slovensko+ RC.scs",
     "version": "latest(1.3)",
@@ -2094,7 +2270,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 90,
+    "id": 91,
     "name": "Slovensko+ v4.3 -  Def",
     "fileName": "Slovensko+ v4.3 - Def.scs",
     "version": "latest(4.3)",
@@ -2103,7 +2279,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 91,
+    "id": 92,
     "name": "Slovensko+ v4.3 -  Map",
     "fileName": "Slovensko+ v4.3 - Map.scs",
     "version": "latest(4.3)",
@@ -2112,7 +2288,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 92,
+    "id": 93,
     "name": "Promods road and cities Poludniowa Polska Merge",
     "fileName": "zzzz_ProMods_road_and_cities_PP_merge.scs",
     "version": "latest(1.57.2)",
@@ -2123,7 +2299,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 93,
+    "id": 94,
     "name": "ProMods road & cities Poland Rebuilding 2.6.2.1 merge",
     "fileName": "zz_ProMods_road_and_cities_PR_merge.scs",
     "version": "latest(2.6.2.2)",
@@ -2134,7 +2310,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 94,
+    "id": 95,
     "name": "BXP Latvia FIX 157.0",
     "fileName": "BXPfixLatvia157.scs",
     "version": "latest(157.0)",
@@ -2143,7 +2319,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 95,
+    "id": 96,
     "name": "BXP Estonia & Russia RC 157.0",
     "fileName": "BXPrcEstoniaRussia157.scs",
     "version": "latest(157.0)",
@@ -2152,7 +2328,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 96,
+    "id": 97,
     "name": "BXP PM Estonia 157.0",
     "fileName": "BXPpmEstonia157.scs",
     "version": "latest(157.0)",
@@ -2161,7 +2337,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 97,
+    "id": 98,
     "name": "BXP PM Russia & Poland RC 157.0",
     "fileName": "BXPpmRussiaPoland157.scs",
     "version": "latest(157.0)",
@@ -2170,7 +2346,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 98,
+    "id": 99,
     "name": "BXP PM Russia 157.0",
     "fileName": "BXPpmRussia157.scs",
     "version": "latest(157.0)",
@@ -2179,7 +2355,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 99,
+    "id": 100,
     "name": "Caucasus City FIX",
     "fileName": "Caucasus city FIX.scs",
     "version": "latest(1.1)",
@@ -2190,7 +2366,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 100,
+    "id": 101,
     "name": "BXP Armenia FIX 156.0",
     "fileName": "BXPfixArmenia156.scs",
     "version": "latest(156.0)",
@@ -2199,7 +2375,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 101,
+    "id": 102,
     "name": "2K24 Turkey ROEX Adaptation - Caucasus Dream Map RC",
     "fileName": "2K24 Turkey ROEX Adapt - Caucasus Dream RC.scs",
     "version": "latest(1.1.1)",
@@ -2210,7 +2386,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 102,
+    "id": 103,
     "name": "2K24 Turkey - ROEX Adaptation",
     "fileName": "2K24 Turkey - ROEX Adaptation.scs",
     "version": "latest(1.2)",
@@ -2221,7 +2397,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 103,
+    "id": 104,
     "name": "Abkazia Map - Promods Caucasus Adjusted RC",
     "fileName": "Abkhazia Map - Promods Caucasus Adjusted RC.scs",
     "version": "latest(1.1)",
@@ -2230,7 +2406,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 104,
+    "id": 105,
     "name": "Abkhazia Map v1.2",
     "fileName": "Abkh Map v.1.2.scs",
     "version": "latest(1.2)",
@@ -2239,7 +2415,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 105,
+    "id": 106,
     "name": "Caucasus Dream Map - Road to Caucasus (ProMods Adjust Version)",
     "fileName": "rxx.rc.rtc_cdm_pro.scs",
     "version": "latest(1.55-2.0)",
@@ -2248,7 +2424,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 106,
+    "id": 107,
     "name": "ProMods - Road to Caucasus RC (ProMods Adjusted Version)",
     "fileName": "rxx.rc.pro_rtc.scs",
     "version": "latest(1.55-1.0)",
@@ -2257,7 +2433,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 107,
+    "id": 108,
     "name": "Archis Armenia - Caucasus Dream Map RC",
     "fileName": "rxx.rc.archis_cdm.scs",
     "version": "latest(1.55-1.1)",
@@ -2266,7 +2442,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 108,
+    "id": 109,
     "name": "Promods Caucasus - Caucasus Dream Map - Roextended(Paid) RC",
     "fileName": "rxx.rc.roexp_pro_cdm.scs",
     "version": "latest(1.55-1.0.2)",
@@ -2275,7 +2451,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 109,
+    "id": 110,
     "name": "Promods Caucasus Adjusted",
     "fileName": "rxx.rc.pro_cau_adj.scs",
     "version": "latest(1.0.2)",
@@ -2284,7 +2460,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 110,
+    "id": 111,
     "name": "Archis ARMENIA V1.0",
     "fileName": "Archis, ARMENIA up 1.55.scs",
     "version": "latest(1.0)",
@@ -2293,7 +2469,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 111,
+    "id": 112,
     "name": "Kirishi - Tikhvin RC",
     "fileName": "KirishiTikhvin 1.3.scs",
     "version": "latest(1.3)",
@@ -2302,7 +2478,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 112,
+    "id": 113,
     "name": "Eurafrica - Promods - El-Enclaves - RIW RC",
     "fileName": "Eurafrica - Promods - El-Enclaves - RIW RC.scs",
     "version": "latest(1.0)",
@@ -2313,7 +2489,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 113,
+    "id": 114,
     "name": "El-Enclaves and Balearic Islands 0.5 (Promods Addon)",
     "fileName": "elenclavebel157.scs",
     "version": "latest(1.57)",
@@ -2324,7 +2500,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 114,
+    "id": 115,
     "name": "RoEX - Donbass - Promods RC",
     "fileName": "RoEX - Donbass - Promods RC.scs",
     "version": "latest(1.0.1)",
@@ -2335,7 +2511,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 115,
+    "id": 116,
     "name": "Petrozavodsk - Suoyarvi RC(Rusmap VK)",
     "fileName": "Petrozavodsk-Suoyarvi_RC_RusMap_VK_1.0.scs",
     "version": "latest(1.0)",
@@ -2344,7 +2520,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 116,
+    "id": 117,
     "name": "ProMods RusMap Roextended Bulgaria Rebuild Connector (ProMods priority version)",
     "fileName": "ProMods RusMap Roextended Bulgaria Rebuild Connector (ProMods priority version).scs",
     "version": "latest(1.0)",
@@ -2353,7 +2529,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 117,
+    "id": 118,
     "name": "Promods - Rusmap - Poland Rebuilding RC",
     "fileName": "ProMods - RusMap - Poland Rebuilding RC.scs",
     "version": "latest(1.7_merge1)",
@@ -2364,7 +2540,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 118,
+    "id": 119,
     "name": "Old ROS Territories - Promods RC(RusMap VK)",
     "fileName": "Old ROS Territories - Promods RC(RusMap VK).scs",
     "version": "latest(1.1.1)",
@@ -2375,7 +2551,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 119,
+    "id": 120,
     "name": "Old Russian Open Spaces Territories Restore(Map Combo Ver.)",
     "fileName": "Old ROS Territories Restore(Map Combo Ver.).scs",
     "version": "latest(1.0)",
@@ -2384,7 +2560,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 120,
+    "id": 121,
     "name": "Promods 2.80(TGS 1.5.0 - ME 2.77) Fix - Sibir 2.11.2FV Compatibility & Localization",
     "fileName": "promods-eu-tgs-me-sibir-fix.scs",
     "version": "not latest(2.80-1.9)",
@@ -2395,7 +2571,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 121,
+    "id": 122,
     "name": "Promods 2.80 Nordic Horizons - RusMap RC(VK)",
     "fileName": "PmNH-RusmapRc2.scs",
     "version": "latest(1.3)",
@@ -2404,7 +2580,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 122,
+    "id": 123,
     "name": "Promods Rusmap Roextended Connector(Promods Priority Version)",
     "fileName": "cnx-pm-v280-rm-v257-roex-v49.scs",
     "version": "latest(1.57.2)",
@@ -2413,7 +2589,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 123,
+    "id": 124,
     "name": "Russian_Open_Spaces",
     "fileName": "Russian_open_spaces_13.8_1.57.scs",
     "version": "latest(13.8)",
@@ -2422,7 +2598,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 124,
+    "id": 125,
     "name": "Road To Caucasus - Rusmap RC v1.8",
     "fileName": "RTC RusMap RC v.1.8.scs",
     "version": "latest(1.8)",
@@ -2431,7 +2607,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 125,
+    "id": 126,
     "name": "RusMap-def_v2.55",
     "fileName": "RusMap-def_v2.55.scs",
     "version": "latest(2.55)",
@@ -2440,7 +2616,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 126,
+    "id": 127,
     "name": "RusMap-Map_v2.55",
     "fileName": "RusMap-map_v2.55.scs",
     "version": "latest(2.55)",
@@ -2449,7 +2625,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 127,
+    "id": 128,
     "name": "RusMap-model_v2.55",
     "fileName": "RusMap-model_v2.55.scs",
     "version": "latest(2.55)",
@@ -2458,7 +2634,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 128,
+    "id": 129,
     "name": "Roextended - Donbass Map RC",
     "fileName": "Roex-DonbassRC.scs",
     "version": "latest(1.57-4.9fix2)",
@@ -2470,7 +2646,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 129,
+    "id": 130,
     "name": "Gukovo - DbSrFixU Fix",
     "fileName": "Gukovo - DbSRFixU Fix.scs",
     "version": "latest",
@@ -2481,7 +2657,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 130,
+    "id": 131,
     "name": "Gukovo(Donbass Version)",
     "fileName": "Gukovo_map-v-1.2.2 (Donbass Version).scs",
     "version": "latest(1.57-1.2.2)",
@@ -2492,7 +2668,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 131,
+    "id": 132,
     "name": "Donbass Fix",
     "fileName": "gmc.donbass.fix.scs",
     "version": "latest(1.57-1.2.1)",
@@ -2501,7 +2677,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 132,
+    "id": 133,
     "name": "Db_SRfix_154",
     "fileName": "db_SRfix_157U.scs",
     "version": "latest(1.57)",
@@ -2512,7 +2688,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 133,
+    "id": 134,
     "name": "ferry_db 1.57",
     "fileName": "ferry_db_157.scs",
     "version": "latest(1.57)",
@@ -2523,7 +2699,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 134,
+    "id": 135,
     "name": "donbass_map 1 57",
     "fileName": "donbassmap_157.scs",
     "version": "latest(1.57)",
@@ -2534,7 +2710,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 135,
+    "id": 136,
     "name": "db_model 1.57",
     "fileName": "db_model157.scs",
     "version": "latest(1.57)",
@@ -2545,7 +2721,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 136,
+    "id": 137,
     "name": "Bulgaria Rebuild - BXP Yugoslavia FIX",
     "fileName": "Bulgaria Rebuild-BXP Yugoslavia fix.scs",
     "version": "latest(1.0)",
@@ -2554,7 +2730,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 137,
+    "id": 138,
     "name": "Bulgaria Rebuild-BXP Greece FIX",
     "fileName": "Bulgaria Rebuild-BXP Greece fix.scs",
     "version": "latest(1.0)",
@@ -2563,7 +2739,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 138,
+    "id": 139,
     "name": "Bulgaria Rebuild (BGIF Addon)",
     "fileName": "Bulgaria Rebuild v1.1.scs",
     "version": "latest(1.1)",
@@ -2572,7 +2748,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 139,
+    "id": 140,
     "name": "Bulgaria in Focus",
     "fileName": "bginfocus-all-v1.34.scs",
     "version": "latest(1.34)",
@@ -2581,7 +2757,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 140,
+    "id": 141,
     "name": "Großwilfersdorf Map Add-On",
     "fileName": "Großwilfersdorf_addon_promods.zip",
     "version": "latest(1.2-1.57)",
@@ -2590,7 +2766,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 141,
+    "id": 142,
     "name": "The Cold North Map",
     "fileName": "sweden.scs",
     "version": "latest(0.1-1.57_promods)",
@@ -2599,7 +2775,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 142,
+    "id": 143,
     "name": "Project Greenland 0.3",
     "fileName": "project-greenland-v0.3.zip",
     "version": "latest(0.3)",
@@ -2610,7 +2786,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 143,
+    "id": 144,
     "name": "SFIGC - Promods Addon",
     "fileName": "SFIGC - a ProMods Addon.scs",
     "version": "latest(0.6-1.57)",
@@ -2621,7 +2797,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 144,
+    "id": 145,
     "name": "Sylt - a Promods Addon",
     "fileName": "Sylt - a ProMods addon.scs",
     "version": "latest",
@@ -2633,7 +2809,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 145,
+    "id": 146,
     "name": "ScandinaviaMod FIX",
     "fileName": "ScandinaviaMod FIX.scs",
     "version": "latest(1.5_nh)",
@@ -2644,7 +2820,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 146,
+    "id": 147,
     "name": "SJMap - Promods FIX",
     "fileName": "SJMap - ProMods FIX.scs",
     "version": "latest(1.3)",
@@ -2653,7 +2829,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 147,
+    "id": 148,
     "name": "SJMap",
     "fileName": "ntrl71_sjmap.zip",
     "version": "latest(R6)",
@@ -2662,7 +2838,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 148,
+    "id": 149,
     "name": "Promods Addon - Emden(V7) + ADG Wertle",
     "fileName": "pm_emden_wertle.scs",
     "version": "latest(V7-1.55)",
@@ -2671,7 +2847,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 149,
+    "id": 150,
     "name": "Wertle Map Addon",
     "fileName": "Werlte Map Addon by ADG Creations.scs",
     "version": "latest(3.3)",
@@ -2680,7 +2856,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 150,
+    "id": 151,
     "name": "BXP PM Yugoslavia Expansion 157.0",
     "fileName": "BXPpmYugo157.scs",
     "version": "latest(157.0)",
@@ -2689,7 +2865,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 151,
+    "id": 152,
     "name": "BXP PM Deutsch & Poland RC 157.0",
     "fileName": "BXPpmDeutschPoland157.scs",
     "version": "latest(157.0)",
@@ -2698,7 +2874,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 152,
+    "id": 153,
     "name": "BXP PM Deutschland 157.0",
     "fileName": "BXPpmDeutschland157.scs",
     "version": "latest(157.0)",
@@ -2707,7 +2883,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 153,
+    "id": 154,
     "name": "BXP PM Ireland 157.0",
     "fileName": "BXPpmIreland157.scs",
     "version": "latest(157.0)",
@@ -2716,7 +2892,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 154,
+    "id": 155,
     "name": "BXP PM Northern Ireland 157.0",
     "fileName": "BXPpmNorthIreland157.scs",
     "version": "latest(157.0)",
@@ -2725,7 +2901,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 155,
+    "id": 156,
     "name": "BXP PM Scotland",
     "fileName": "BXPpmScotland157.scs",
     "version": "latest(157.0)",
@@ -2734,7 +2910,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 156,
+    "id": 157,
     "name": "BXP PM London 157.0",
     "fileName": "BXPpmLondon157.scs",
     "version": "latest(157.0)",
@@ -2743,7 +2919,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 157,
+    "id": 158,
     "name": "BXP PM Andorra 157.0",
     "fileName": "BXPpmAndorra157.scs",
     "version": "latest(157.0)",
@@ -2752,7 +2928,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 158,
+    "id": 159,
     "name": "BXP PM Monaco 157.0",
     "fileName": "BXPpmMonaco157.scs",
     "version": "latest(157.0)",
@@ -2761,7 +2937,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 159,
+    "id": 160,
     "name": "BXP PM Faroes 157.0",
     "fileName": "BXPpmFaroes157.scs",
     "version": "latest(157.0)",
@@ -2770,7 +2946,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 160,
+    "id": 161,
     "name": "BXP PM Isle Of Man 157.0",
     "fileName": "BXPpmIOM157.scs",
     "version": "latest(157.0)",
@@ -2779,7 +2955,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 161,
+    "id": 162,
     "name": "BXP PM Malta 157.0",
     "fileName": "BXPpmMalta157.scs",
     "version": "latest(157.0)",
@@ -2788,7 +2964,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 162,
+    "id": 163,
     "name": "BXP PM Cyprus 157.0",
     "fileName": "BXPpmCyprus157.scs",
     "version": "latest(157.0)",
@@ -2797,7 +2973,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 163,
+    "id": 164,
     "name": "BXP SCS Baleares 157.0",
     "fileName": "BXPscsBaleares157.scs",
     "version": "latest(157.0)",
@@ -2806,7 +2982,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 164,
+    "id": 165,
     "name": "BXP SCS Tyrrhenia 157.0",
     "fileName": "BXPscsTyrrhenia157.scs",
     "version": "latest(157.0)",
@@ -2815,7 +2991,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 165,
+    "id": 166,
     "name": "Saalfelden Map Addon",
     "fileName": "Saalfelden Map Addon By ADG Creations.zip",
     "version": "latest(1.2)",
@@ -2824,7 +3000,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 166,
+    "id": 167,
     "name": "Austria+ Austrian Alpine Fix",
     "fileName": "gmc.austria.austrian_apline.fix.scs",
     "version": "latest(1.54-1.0)",
@@ -2833,7 +3009,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 167,
+    "id": 168,
     "name": "Austrian Alpine Region Addon",
     "fileName": "Austrian Alpine Region Addon By ADG Creations.zip",
     "version": "latest(1.1)",
@@ -2842,7 +3018,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 168,
+    "id": 169,
     "name": "Erfurt Map Addon",
     "fileName": "Erfurt_Map_Addon_By_ADG_Creations.scs",
     "version": "latest(1.0)",
@@ -2851,7 +3027,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 169,
+    "id": 170,
     "name": "Ath - Belgium Map",
     "fileName": "Ath - Belgium Map Addon By ADG Creations.scs",
     "version": "latest(3.1)",
@@ -2860,7 +3036,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 170,
+    "id": 171,
     "name": "Narvik Company Addon",
     "fileName": "Narvik Company Addon By ADG Creations.scs",
     "version": "latest(1.0)",
@@ -2869,7 +3045,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 171,
+    "id": 172,
     "name": "ADG Truck Service Map Addon",
     "fileName": "ADG Truck Service by ADG Creations.scs",
     "version": "latest(1.3)",
@@ -2878,7 +3054,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 172,
+    "id": 173,
     "name": "Pays de la Lorie Extended",
     "fileName": "pdlextended 1.0a.scs",
     "version": "latest(1.0a)",
@@ -2887,7 +3063,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 173,
+    "id": 174,
     "name": "Bourges Updated",
     "fileName": "Bourges Updated (map addon) v1.0.2.scs",
     "version": "latest(1.0.2)",
@@ -2896,7 +3072,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 174,
+    "id": 175,
     "name": "Latvia Rebuild v1.28 for PM v2.77",
     "fileName": "latvia-rebuild-v1_28-for-PM-v2_77.scs",
     "version": "latest(1.28-1.56)",
@@ -2905,7 +3081,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 175,
+    "id": 176,
     "name": "Peyrat-le-Chateau(map addon)",
     "fileName": "Peyrat-le-Château map add-on v1.1.1.scs",
     "version": "latest(1.1.1)",
@@ -2914,7 +3090,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 176,
+    "id": 177,
     "name": "Tours(Map Addon)",
     "fileName": "Tours_map_add-on_v1.0.2.scs",
     "version": "latest(1.0.2)",
@@ -2925,7 +3101,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 177,
+    "id": 178,
     "name": "Crni Kal I A Promods Addon",
     "fileName": "crni_kal_157.scs",
     "version": "latest(1.3)",
@@ -2934,7 +3110,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 178,
+    "id": 179,
     "name": "Pyla Map add-on v1.4",
     "fileName": "Pyla map add-on v1.4.scs",
     "version": "latest(1.4)",
@@ -2943,7 +3119,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 179,
+    "id": 180,
     "name": "Sud de France & Promods FIX",
     "fileName": "S2F & Promods Fix v1.1.1 by Adyox.scs",
     "version": "latest(1.1.1)",
@@ -2952,7 +3128,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 180,
+    "id": 181,
     "name": "Sud de France",
     "fileName": "_v2.0.2b__PUBLIC_Sud_de_France_by_Charly.scs",
     "version": "latest(2.0.2b)",
@@ -2961,7 +3137,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 181,
+    "id": 182,
     "name": "Santiago de Compostela anadido",
     "fileName": "santiago12.scs",
     "version": "latest(1.2)",
@@ -2970,7 +3146,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 182,
+    "id": 183,
     "name": "Friuli Giulia IMP Add-On V1.20",
     "fileName": "FRIULI_GIULIA_IMP.scs",
     "version": "latest(V1.20)",
@@ -2979,7 +3155,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 183,
+    "id": 184,
     "name": "TrucksMap UK v1.3",
     "fileName": "Trucksmap UK 1.3.scs",
     "version": "latest(1.3)",
@@ -2990,7 +3166,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 184,
+    "id": 185,
     "name": "UK S&OI V1.3",
     "fileName": "UKS&OI V1.3.scs",
     "version": "latest(V1.3)",
@@ -3001,7 +3177,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 185,
+    "id": 186,
     "name": "Wales Reskin V1.01",
     "fileName": "walesreskin.v1.01.scs",
     "version": "latest(1.01)",
@@ -3010,7 +3186,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 186,
+    "id": 187,
     "name": "Viva Malta",
     "fileName": "vivamalta151-2.scs",
     "version": "latest(2.2.1)",
@@ -3019,7 +3195,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 187,
+    "id": 188,
     "name": "MedMap - ROEX Fix 1.55-1.0",
     "fileName": "xiaoan.medmap-roex-fix.scs",
     "version": "latest(1.0)",
@@ -3028,7 +3204,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 188,
+    "id": 189,
     "name": "MedMap - Italy Map Project Fix",
     "fileName": "MedMap - Italy Map Project FIX.scs",
     "version": "latest(1.3)",
@@ -3037,7 +3213,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 189,
+    "id": 190,
     "name": "Italy Map Project Promods Fix",
     "fileName": "gmc.imp.promods.fix.scs",
     "version": "latest(1.55-1.1.0)",
@@ -3046,7 +3222,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 190,
+    "id": 191,
     "name": "Italy Map Project Fix",
     "fileName": "gmc.italy_map_project.fix.scs",
     "version": "latest(1.55-1.0)",
@@ -3055,7 +3231,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 191,
+    "id": 192,
     "name": "Addon Promods IMP - 1.56",
     "fileName": "IMP_V14_PM_1_56_Fixed.scs",
     "version": "latest(V14)",
@@ -3064,7 +3240,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 192,
+    "id": 193,
     "name": "Italy Map Project V14",
     "fileName": "IMP_V14_1_57.scs",
     "version": "latest(V14)",
@@ -3073,7 +3249,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 193,
+    "id": 194,
     "name": "MedMap Reborn-Def 1.55-1.0",
     "fileName": "xiaoan.medmapr-def.scs",
     "version": "latest(1.55-1.0)",
@@ -3082,7 +3258,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 194,
+    "id": 195,
     "name": "More European Cities(Greece) - Beyond RC",
     "fileName": "rxx.rc.by_mecg.scs",
     "version": "latest(1.55-2.0)",
@@ -3091,7 +3267,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 195,
+    "id": 196,
     "name": "BXP PM Greece 157.0",
     "fileName": "BXPpmGreece157.scs",
     "version": "latest(157.0)",
@@ -3100,7 +3276,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 196,
+    "id": 197,
     "name": "More European Cities(Greece)",
     "fileName": "More European Cities (Greece - v1.1).scs",
     "version": "latest(1.1)",
@@ -3109,7 +3285,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 197,
+    "id": 198,
     "name": "E60 Extended - Promods Addon",
     "fileName": "e60-extended.zip",
     "version": "latest(1.3)",
@@ -3118,7 +3294,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 198,
+    "id": 199,
     "name": "Senj Map Add-on (Promods Compatible)",
     "fileName": "senj_map_addon.zip",
     "version": "latest(1.4)",
@@ -3127,7 +3303,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 199,
+    "id": 200,
     "name": "Arad Addon",
     "fileName": "Arad Addon.zip",
     "version": "latest(0.1)",
@@ -3138,7 +3314,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 200,
+    "id": 201,
     "name": "Rofte Kosova - West Balkans Improvements",
     "fileName": "Rrofte_Kosova.scs",
     "version": "latest(0.3.5)",
@@ -3147,7 +3323,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 201,
+    "id": 202,
     "name": "Isle Of Colonsay V2.0",
     "fileName": "Isle Of Colonsay 2.0.scs",
     "version": "latest(2.0)",
@@ -3156,7 +3332,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 202,
+    "id": 203,
     "name": "Promods Barcelona EXP",
     "fileName": "PmBarcelonaExp.scs",
     "version": "latest(2.0)",
@@ -3165,7 +3341,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 203,
+    "id": 204,
     "name": "House south of Ostersund",
     "fileName": "nhhousesw.scs",
     "version": "latest(1.9.6)",
@@ -3176,7 +3352,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 204,
+    "id": 205,
     "name": "Sverige Sodra Expansion",
     "fileName": "sverige_södra_expansion_byNacho.scs",
     "version": "latest(1.1.5)",
@@ -3187,7 +3363,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 205,
+    "id": 206,
     "name": "Danmark Refined v1.2",
     "fileName": "Danmark Refined v1.2.scs",
     "version": "latest(1.2)",
@@ -3196,7 +3372,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 206,
+    "id": 207,
     "name": "Ourense Mod by Morerira",
     "fileName": "Ourense_Mod.scs",
     "version": "latest(1.2)",
@@ -3205,7 +3381,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 207,
+    "id": 208,
     "name": "Portugal Rebuild v 0.1.6.1 Promods Addon",
     "fileName": "Portugal Rebuild v0.1.6,1 Promods addon.scs",
     "version": "latest(0.1.6,1)",
@@ -3214,7 +3390,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 208,
+    "id": 209,
     "name": "Iberia Map RW FIX",
     "fileName": "Iberia Map RW FIX.scs",
     "version": "latest(1.3)",
@@ -3223,7 +3399,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 209,
+    "id": 210,
     "name": "Iberia Promods Map RW v1.3.8",
     "fileName": "promods_eu_280_ib_rw_157_v1.38.scs",
     "version": "latest(1.38)",
@@ -3232,7 +3408,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 210,
+    "id": 211,
     "name": "Rhineland Map Combo Fix",
     "fileName": "rxx.fix.combo.rhi.scs",
     "version": "latest(1.55-4.0)",
@@ -3241,7 +3417,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 211,
+    "id": 212,
     "name": "Rhineland Map - A4 rework Strassbourg-Metz",
     "fileName": "Rhineland Map - A4 rework Strasbourg-Metz.scs",
     "version": "latest(1.0.1)",
@@ -3250,7 +3426,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 212,
+    "id": 213,
     "name": "Rhineland Map - Promods RC Fix",
     "fileName": "Rhineland_Map_-_Promods_RC_Fix_by_Foryst.scs",
     "version": "latest(1.2)",
@@ -3261,7 +3437,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 213,
+    "id": 214,
     "name": "Rhineland Map - Promods RC",
     "fileName": "RhinelandMap - ProMods RC.scs",
     "version": "latest(1.4)",
@@ -3270,7 +3446,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 214,
+    "id": 215,
     "name": "Rhineland Map",
     "fileName": "RhinelandMap_1_4.scs",
     "version": "latest(1.4)",
@@ -3279,7 +3455,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 215,
+    "id": 216,
     "name": "Projekt Cesko v2.47 Def+Map package",
     "fileName": "zzzProjektCesko2_47defmap.scs",
     "version": "latest(2.47)",
@@ -3288,7 +3464,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 216,
+    "id": 217,
     "name": "Poludnuiowa Polska",
     "fileName": "zzz_poludniowa_polska_1.6.2.scs",
     "version": "latest(1.6.2-1.57)",
@@ -3297,7 +3473,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 217,
+    "id": 218,
     "name": "Poland Rebuilding - Fix 1",
     "fileName": "z0_PL_Rebuilding_2.6.2_FIX_1.scs",
     "version": "latest(2.6.2 FIX1)",
@@ -3306,7 +3482,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 218,
+    "id": 219,
     "name": "Poland Rebuilding - Def",
     "fileName": "z1_PL_Rebuilding_2.6.2_def.scs",
     "version": "latest(2.6.2)",
@@ -3315,7 +3491,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 219,
+    "id": 220,
     "name": "Poland Rebuilding - Map",
     "fileName": "z2_PL_Rebuilding_2.6.2_map.scs",
     "version": "latest(2.6.2)",
@@ -3324,7 +3500,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 220,
+    "id": 221,
     "name": "Poland Rebuilding - Models",
     "fileName": "z3_PL_Rebuilding_2.6.2_models.scs",
     "version": "latest(2.6.2)",
@@ -3333,7 +3509,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 221,
+    "id": 222,
     "name": "Poland Rebuilding - Assets",
     "fileName": "z4_PL_Rebuilding_2.6.2_assets.scs",
     "version": "latest(2.6.2)",
@@ -3342,7 +3518,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 222,
+    "id": 223,
     "name": "Projekt Cesko v2.47 Assets 2 package",
     "fileName": "zzProjektCesko2_47assets2.scs",
     "version": "latest(2.47)",
@@ -3351,7 +3527,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 223,
+    "id": 224,
     "name": "Projekt Cesko v2.47 Assets package",
     "fileName": "zProjektCesko2_47assets.scs",
     "version": "latest(2.47)",
@@ -3360,7 +3536,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 224,
+    "id": 225,
     "name": "Austria+",
     "fileName": "austria.zip",
     "version": "latest(0.5)",
@@ -3369,7 +3545,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 225,
+    "id": 226,
     "name": "Oberhavel Pro Mods",
     "fileName": "Oberhavel.ProMods.scs",
     "version": "latest(1.7.3)",
@@ -3378,7 +3554,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 226,
+    "id": 227,
     "name": "Promods ME - Caucasus Dream Map RC",
     "fileName": "Promods ME - Caucasus Dream Map RC.scs",
     "version": "latest(1.1)",
@@ -3387,7 +3563,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 227,
+    "id": 228,
     "name": "Syria - a Promods Addon",
     "fileName": "Syria - a ProMods Addon.scs",
     "version": "latest(1.0-1.57)",
@@ -3396,7 +3572,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 228,
+    "id": 229,
     "name": "Project Palestine - ProMods Middle East Add-on",
     "fileName": "ProjectPalestine.scs",
     "version": "latest(1.8)",
@@ -3405,7 +3581,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 229,
+    "id": 230,
     "name": "FIX RC Tunisia - Egyptian - Libyan Gateway",
     "fileName": "FIX-RC_Egyptian-Libyan-Tunisa.scs",
     "version": "latest",
@@ -3414,7 +3590,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 230,
+    "id": 231,
     "name": "Egyprtian-Libyan Gateway",
     "fileName": "Egyptian-Libyan_Gateway_v1.3.scs",
     "version": "latest(1.3)",
@@ -3423,7 +3599,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 231,
+    "id": 232,
     "name": "Red Sea FIX",
     "fileName": "Red Sea FIX.zip",
     "version": "latest",
@@ -3432,7 +3608,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 232,
+    "id": 233,
     "name": "Red Sea Map + Beyond PMME RC + Beyond PM RC & Fix",
     "fileName": "gmc.red_sea_map.beyond_pmme_rc.beyond_pm_rc_fix.scs",
     "version": "latest(1.57-1.0)",
@@ -3441,7 +3617,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 233,
+    "id": 234,
     "name": "Extended Roads (Addon ME) v0.1.0",
     "fileName": "extended-roads-me-v0.1.0.scs",
     "version": "latest(0.1.0)",
@@ -3450,7 +3626,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 234,
+    "id": 235,
     "name": "Promods Middle-East 2.77 Fix & QoL",
     "fileName": "promods-me-fix-qol-v277.scs",
     "version": "2.77-1.0",
@@ -3461,7 +3637,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 235,
+    "id": 236,
     "name": "Promods Middle-East Add-on (Repack Pacakge)",
     "fileName": "promods-me-repack-v277.scs",
     "version": "latest(2.77repack)",
@@ -3472,7 +3648,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 236,
+    "id": 237,
     "name": "Extended Roads v0.1.0-pm2.77",
     "fileName": "extended-roads-v0.1.0.scs",
     "version": "latest(0.1.0)",
@@ -3481,7 +3657,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 237,
+    "id": 238,
     "name": "Promods Europe 2.80 Fix & QoL",
     "fileName": "promods-eu-fix-qol-v280.scs",
     "version": "2.80-1.5",
@@ -3492,7 +3668,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 238,
+    "id": 239,
     "name": "Promods Models Package 1",
     "fileName": "promods-eu-repack2-v280.scs",
     "version": "latest(2.80repack)",
@@ -3503,7 +3679,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 239,
+    "id": 240,
     "name": "Promods Models Package 2",
     "fileName": "promods-eu-model3-v280.scs",
     "version": "latest(2.80repack)",
@@ -3514,7 +3690,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 240,
+    "id": 241,
     "name": "Promods Models Package 3",
     "fileName": "promods-eu-repack1-v280.scs",
     "version": "latest(2.80repack)",
@@ -3525,7 +3701,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 241,
+    "id": 242,
     "name": "Promods DLC Support Package",
     "fileName": "promods-eu-dlcsupport-v280.zip",
     "version": "latest(2.80repack)",
@@ -3536,7 +3712,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 242,
+    "id": 243,
     "name": "Road To Caucasus - Promods The Great Steepe RC",
     "fileName": "RTC TGS RC v.1.8.1.scs",
     "version": "latest(1.8.1)",
@@ -3545,7 +3721,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 243,
+    "id": 244,
     "name": "Rad To Caucasus Version 2.4",
     "fileName": "RTC v.2.4.scs",
     "version": "latest(2.4)",
@@ -3554,7 +3730,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 244,
+    "id": 245,
     "name": "ROEX49SR13.1 RC",
     "fileName": "ROEX49SR131.scs",
     "version": "latest(4.9)",
@@ -3563,7 +3739,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 245,
+    "id": 246,
     "name": "ROEX49Core",
     "fileName": "ROEX49core.scs",
     "version": "latest(4.9)",
@@ -3572,7 +3748,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 246,
+    "id": 247,
     "name": "ROEX49main1",
     "fileName": "ROEX49main1.scs",
     "version": "latest(4.9)",
@@ -3581,7 +3757,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 247,
+    "id": 248,
     "name": "ROEX49main2",
     "fileName": "ROEX49main2.scs",
     "version": "latest(4.9)",
@@ -3590,7 +3766,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 248,
+    "id": 249,
     "name": "ROEX49main3",
     "fileName": "ROEX49main3.scs",
     "version": "latest(4.9)",
@@ -3599,7 +3775,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 249,
+    "id": 250,
     "name": "ROEX49main4",
     "fileName": "ROEX49main4.scs",
     "version": "latest(4.9)",
@@ -3608,7 +3784,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 250,
+    "id": 251,
     "name": "SRMap Combo Fix",
     "fileName": "rxx.fix.combo.sr.scs",
     "version": "latest(1.55-6.0)",
@@ -3617,7 +3793,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 251,
+    "id": 252,
     "name": "SRMap UNOFFICIAL",
     "fileName": "SRmod_v13_1(UNOFFICIAL).scs",
     "version": "latest(13.1-UNOFFICIAL)",
@@ -3626,7 +3802,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 252,
+    "id": 253,
     "name": "Baikal Map",
     "fileName": "Baikal Map.scs",
     "version": "latest(2.0)",
@@ -3635,7 +3811,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 253,
+    "id": 254,
     "name": "Amur Map - Beyond FIX",
     "fileName": "Amur Map - Beyond FIX.scs",
     "version": "latest(1.1.1)",
@@ -3646,7 +3822,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 254,
+    "id": 255,
     "name": "Sakhalin Map - Amur Map FIX",
     "fileName": "Sakhalin Map-Amur map FIX.scs",
     "version": "latest(1.0)",
@@ -3655,7 +3831,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 255,
+    "id": 256,
     "name": "Sakhalin Map",
     "fileName": "SakhalinMap 1.0.scs",
     "version": "latest(1.0)",
@@ -3664,7 +3840,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 256,
+    "id": 257,
     "name": "Chernyshevsk - Borzya RC",
     "fileName": "Chernyshevsk - Borzya RC.scs",
     "version": "latest(1.0)",
@@ -3673,7 +3849,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 257,
+    "id": 258,
     "name": "Trans-Siberia - Amur Map RC",
     "fileName": "Trans-Siberia Amur Map RC.scs",
     "version": "latest(3.0.1)",
@@ -3682,7 +3858,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 258,
+    "id": 259,
     "name": "AmurMap1.0.1",
     "fileName": "amurmap101.scs",
     "version": "latest(1.0.1)",
@@ -3691,7 +3867,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 259,
+    "id": 260,
     "name": "FER - CHUKOTKA ADDON RC",
     "fileName": "FER - CHUKOTKA RC.scs",
     "version": "latest(1.0)",
@@ -3702,7 +3878,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 260,
+    "id": 261,
     "name": "Chukotka - Far East Russia Addon",
     "fileName": "FER Chukotka ADDON v1.scs",
     "version": "latest(1.0)",
@@ -3713,7 +3889,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 261,
+    "id": 262,
     "name": "FER - OTGR RC",
     "fileName": "FER - OTGR rc.scs",
     "version": "latest(v2)",
@@ -3724,7 +3900,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 262,
+    "id": 263,
     "name": "FER - TST RC",
     "fileName": "FER - TST RC.scs",
     "version": "latest(v3)",
@@ -3735,7 +3911,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 263,
+    "id": 264,
     "name": "Far East Russia",
     "fileName": "Far East Russia Alpha 30.scs",
     "version": "latest(Alpha 30changed)",
@@ -3747,7 +3923,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 264,
+    "id": 265,
     "name": "Trans-Siberia Truck Dream Road RC",
     "fileName": "Trans-Siberia Truck Dream Road RC.scs",
     "version": "latest(2.0)",
@@ -3756,7 +3932,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 265,
+    "id": 266,
     "name": "Trans-Siberia Far-East Russia RC",
     "fileName": "Trans-Siberia_Far_East_Russia_RC.scs",
     "version": "latest(3.0)",
@@ -3767,7 +3943,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 266,
+    "id": 267,
     "name": "Trans-Siberia Off The Grid RC",
     "fileName": "Trans-Siberia Off The Grid RC.scs",
     "version": "latest(2.0)",
@@ -3778,7 +3954,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 267,
+    "id": 268,
     "name": "Trans-Siberia Beyond RC",
     "fileName": "Trans-Siberia_Beyond_RC.scs",
     "version": "latest(2.0)",
@@ -3787,7 +3963,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 268,
+    "id": 269,
     "name": "Trans-Siberia Altai Map RC",
     "fileName": "Trans-Siberia_Altai_Map_RC.scs",
     "version": "latest(1.9)",
@@ -3796,7 +3972,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 269,
+    "id": 270,
     "name": "Trans-Siberia SibirMap Paid RC",
     "fileName": "Trans-Siberia SibirMap Paid RC.scs",
     "version": "latest(2.2)",
@@ -3805,7 +3981,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 270,
+    "id": 271,
     "name": "Trans-Siberian Truckway",
     "fileName": "Trans-Siberian Truckway.scs",
     "version": "latest(3.0)",
@@ -3814,7 +3990,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 271,
+    "id": 272,
     "name": "Java Road Revolution - Southeast Asia FIX",
     "fileName": "Java Road Revolution - Southeast Asia FIX.scs",
     "version": "latest(1.5)",
@@ -3823,7 +3999,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 272,
+    "id": 273,
     "name": "Java Road Revolution (JRR) Def & Map",
     "fileName": "JRR_Def&Map_DF-BG.scs",
     "version": "latest(0.91a)",
@@ -3832,7 +4008,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 273,
+    "id": 274,
     "name": "Java Road Revolution (JRR) Assets & Models 1",
     "fileName": "JRR_Assets&Models1.scs",
     "version": "latest(0.91a)",
@@ -3841,7 +4017,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 274,
+    "id": 275,
     "name": "Java Road Revolution (JRR) Assets & Models 2",
     "fileName": "JRR_Assets&Models2.scs",
     "version": "latest(0.91a)",
@@ -3850,7 +4026,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 275,
+    "id": 276,
     "name": "SEA- TRUCK DREAM ROAD RC + FIX",
     "fileName": "SEA-TDRFIX.scs",
     "version": "latest(1.4)",
@@ -3859,7 +4035,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 276,
+    "id": 277,
     "name": "South East Asia - RC",
     "fileName": "S.E.A-RC.scs",
     "version": "latest(1.5)",
@@ -3868,7 +4044,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 277,
+    "id": 278,
     "name": "SEA Ferry Fix",
     "fileName": "sea_ferry_fix.scs",
     "version": "latest(1.0)",
@@ -3877,7 +4053,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 278,
+    "id": 279,
     "name": "Southeast Asia Buffer Fix",
     "fileName": "Southeast Asia Loading Buffer Fix.scs",
     "version": "latest(1.0)",
@@ -3886,7 +4062,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 279,
+    "id": 280,
     "name": "Southeast Asia FIX",
     "fileName": "Southeast Asia FIX.scs",
     "version": "latest(1.5)",
@@ -3895,7 +4071,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 280,
+    "id": 281,
     "name": "Southeast_Asia_Map South Region (DON'T USE IT)",
     "fileName": "Southeast_Asia_Map South Region.scs",
     "version": "latest(0.2.7.2)",
@@ -3904,7 +4080,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 281,
+    "id": 282,
     "name": "Southeast Asia Map Ver 0.2.7.2 1.57 01",
     "fileName": "Southeast_Asia_Map_Ver 0.2.7.2 1.57 01.scs",
     "version": "latest(0.2.7.2)",
@@ -3913,7 +4089,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 282,
+    "id": 283,
     "name": "Southeast Asia Map Ver 0.2.7.2 1.57 02",
     "fileName": "Southeast_Asia_Map_Ver 0.2.7.2 1.57 02.scs",
     "version": "latest(0.2.7.2)",
@@ -3922,7 +4098,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 283,
+    "id": 284,
     "name": "Australia Tasmania VolgaMap Fix",
     "fileName": "gmc.australia_tasmania.volgamap.fix.scs",
     "version": "latest(1.56-1.0)",
@@ -3931,7 +4107,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 284,
+    "id": 285,
     "name": "VolgaMap Fix",
     "fileName": "gmc.volgamap.fix.scs",
     "version": "latest(1.57-1.0.2)",
@@ -3940,7 +4116,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 285,
+    "id": 286,
     "name": "Volga Map - Promods T.G.S RC",
     "fileName": "VolgaMap-PmTGS-RC.scs",
     "version": "latest(1.3)",
@@ -3949,7 +4125,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 286,
+    "id": 287,
     "name": "VolgaMap 1.5.3",
     "fileName": "VolgaMap_1_5_3.scs",
     "version": "latest(1.5.3)",
@@ -3958,7 +4134,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 287,
+    "id": 288,
     "name": "Eurafrica - BXP Tunisia RC",
     "fileName": "Eurafrica - BXP Tunisia RC.scs",
     "version": "latest(1.0.1)",
@@ -3969,7 +4145,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 288,
+    "id": 289,
     "name": "Eurafrica - Road Into Wilderness RC",
     "fileName": "Eurafrica - RIW RC.scs",
     "version": "latest(1.2)",
@@ -3980,7 +4156,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 289,
+    "id": 290,
     "name": "Eurafrica Promods Fix",
     "fileName": "gmc.eurafrica.promods.fix.scs",
     "version": "latest(1.57-1.0.1)",
@@ -3991,7 +4167,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 290,
+    "id": 291,
     "name": "Eurafrica RC Beyond",
     "fileName": "_Eurafrica_RC_Beyond.scs",
     "version": "latest(3.8)",
@@ -4002,7 +4178,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 291,
+    "id": 292,
     "name": "_Eurafrica_3.8.F1",
     "fileName": "_Eurafrica_3.8_F1.scs",
     "version": "latest(3.8)",
@@ -4013,7 +4189,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 292,
+    "id": 293,
     "name": "_Eurafrica_3.8.F2",
     "fileName": "_Eurafrica_3.8_F2.scs",
     "version": "latest(3.8)",
@@ -4024,7 +4200,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 293,
+    "id": 294,
     "name": "_Eurafrica_3.8.F3",
     "fileName": "_Eurafrica_3.8_F3.scs",
     "version": "latest(3.8)",
@@ -4035,7 +4211,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 294,
+    "id": 295,
     "name": "BXP Tunisia & Libya RC 156.0",
     "fileName": "BXPrcTunLyb156.scs",
     "version": "latest(156.0)",
@@ -4044,7 +4220,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 295,
+    "id": 296,
     "name": "BXP SCS Tunisia 157.0",
     "fileName": "BXPscsTunisia157.scs",
     "version": "latest(157.0)",
@@ -4053,7 +4229,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 296,
+    "id": 297,
     "name": "Heart Of Africa - RIW RC + Senegal Addon",
     "fileName": "Heart of Africa - RIW RC + Senegal addon.scs",
     "version": "latest(1.1)",
@@ -4062,7 +4238,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 297,
+    "id": 298,
     "name": "RIW - Project Comoros Ferry Connection 1.54-1.0",
     "fileName": "xiaoan.riw-pjcom.scs",
     "version": "latest(1.0)",
@@ -4071,7 +4247,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 298,
+    "id": 299,
     "name": "Africa Extended - RIW RC",
     "fileName": "Africa Extended - RIW RC.scs",
     "version": "latest(1.1)",
@@ -4080,7 +4256,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 299,
+    "id": 300,
     "name": "West Africa - RIW RC",
     "fileName": "West Africa - RIW RC.scs",
     "version": "latest(1.1_change)",
@@ -4091,7 +4267,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 300,
+    "id": 301,
     "name": "RIW to Horn Of Africa Fix",
     "fileName": "rxx.riw.hoa.rc.fix.scs",
     "version": "latest(1.54-1.0)",
@@ -4100,7 +4276,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 301,
+    "id": 302,
     "name": "RIW to Horn Of Africa",
     "fileName": "RIW Horn of Africa RC 2.0.scs",
     "version": "latest(2.0)",
@@ -4109,7 +4285,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 302,
+    "id": 303,
     "name": "RIW to Beyond RC",
     "fileName": "RIW_Beyond_RC.scs",
     "version": "latest(2.2)",
@@ -4118,7 +4294,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 303,
+    "id": 304,
     "name": "RIW to Heart of Africa",
     "fileName": "RIW_Heart_of_Africa_RC 1.54.scs",
     "version": "latest(1.1)",
@@ -4127,7 +4303,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 304,
+    "id": 305,
     "name": "RIW 2.2.1",
     "fileName": "RIW 2.2.1.scs",
     "version": "latest(2.2.1)",
@@ -4136,7 +4312,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 305,
+    "id": 306,
     "name": "RIW models",
     "fileName": "RIW 2.2.1 MODELS.scs",
     "version": "latest(2.2.1)",
@@ -4145,7 +4321,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 306,
+    "id": 307,
     "name": "Beyond - Caucasus Dream Map Road Connection",
     "fileName": "beycdmrc_1.2.scs",
     "version": "latest(1.2)",
@@ -4154,7 +4330,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 307,
+    "id": 308,
     "name": "Roads Of Chungwa - Beyond RC",
     "fileName": "Roads of Chunghwa - Beyond RC.scs",
     "version": "latest(1.2)",
@@ -4163,7 +4339,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 308,
+    "id": 309,
     "name": "Promods The Great Steppe - Beyond Road Connection",
     "fileName": "gmc.pm_tgs.beyond.rc.scs",
     "version": "latest(1.55-1.1)",
@@ -4172,7 +4348,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 309,
+    "id": 310,
     "name": "Kazakhstan - Beyond RC",
     "fileName": "Kazakhstan-BeyondRC.scs",
     "version": "latest(1.3)",
@@ -4181,7 +4357,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 310,
+    "id": 311,
     "name": "Beyond Routing Fix",
     "fileName": "Beyond_Routing_Fix.scs",
     "version": "latest(2.1)",
@@ -4190,7 +4366,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 311,
+    "id": 312,
     "name": "Winterland Beyond Fix",
     "fileName": "gmc.winterland.beyond.fix.scs",
     "version": "latest(1.55-1.0)",
@@ -4199,7 +4375,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 312,
+    "id": 313,
     "name": "Roads Of Chunghwa Beyond Fix",
     "fileName": "gmc.roc.beyond.fix.scs",
     "version": "latest(1.0)",
@@ -4208,7 +4384,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 313,
+    "id": 314,
     "name": "Beyond Horn Of Africa Fix",
     "fileName": "gmc.beyond.hoa.fix.scs",
     "version": "latest(1.57-1.0.0)",
@@ -4217,7 +4393,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 314,
+    "id": 315,
     "name": "Beyond Africa Extended Fix",
     "fileName": "gmc.beyond.africa_ext.fix.scs",
     "version": "latest(1.57-1.0.0)",
@@ -4226,7 +4402,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 315,
+    "id": 316,
     "name": "Beyond Fix",
     "fileName": "gmc.beyond.fix.scs",
     "version": "latest(1.56-1.2)",
@@ -4235,7 +4411,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 316,
+    "id": 317,
     "name": "Caucasus Dream Map",
     "fileName": "Caucasus dream map.scs",
     "version": "latest(2.7changed)",
@@ -4246,7 +4422,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 317,
+    "id": 318,
     "name": "Beyond by TerraMaps 1",
     "fileName": "Beyond_by_TerraMaps_1.scs",
     "version": "latest(7.0)",
@@ -4255,7 +4431,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 318,
+    "id": 319,
     "name": "Beyond by TerraMaps 2",
     "fileName": "Beyond_by_TerraMaps_2.scs",
     "version": "latest(7.0)",
@@ -4264,7 +4440,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 319,
+    "id": 320,
     "name": "Beyond by TerraMaps 3",
     "fileName": "Beyond_by_TerraMaps_3.scs",
     "version": "latest(7.0)",
@@ -4273,7 +4449,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 320,
+    "id": 321,
     "name": "Beyond by TerraMaps 4",
     "fileName": "Beyond_by_TerraMaps_4.scs",
     "version": "latest(7.0)",
@@ -4282,7 +4458,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 321,
+    "id": 322,
     "name": "Beyond by TerraMaps 5",
     "fileName": "Beyond_by_TerraMaps_5.scs",
     "version": "latest(7.0)",
@@ -4291,7 +4467,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 322,
+    "id": 323,
     "name": "EAA Rescaled",
     "fileName": "EAA Rescaled.scs",
     "version": "latest(2.4)",
@@ -4300,7 +4476,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 323,
+    "id": 324,
     "name": "Tumul_-_Aldan_FER_Fix",
     "fileName": "Tumul_-_Aldan_FER_Fix.scs",
     "version": "latest",
@@ -4311,7 +4487,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 324,
+    "id": 325,
     "name": "Sinegorye Add-on",
     "fileName": "Sinegorye Add-on.scs",
     "version": "latest(1.0)",
@@ -4320,7 +4496,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 325,
+    "id": 326,
     "name": "Off The Grid - Special Transport",
     "fileName": "otgr_st.scs",
     "version": "latest(3.3)",
@@ -4329,7 +4505,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 326,
+    "id": 327,
     "name": "Off The Grid - Def/Map",
     "fileName": "otgr_defmap.scs",
     "version": "latest(3.3)",
@@ -4338,7 +4514,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 327,
+    "id": 328,
     "name": "Off The Grid - Assets/Models",
     "fileName": "otgr_assets.scs",
     "version": "latest(3.3)",
@@ -4347,7 +4523,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 328,
+    "id": 329,
     "name": "Altai Map Fix",
     "fileName": "gmc.altai_map.fix.scs",
     "version": "laetst(1.57-1.0.0)",
@@ -4356,7 +4532,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 329,
+    "id": 330,
     "name": "Kazakhstan - Altai RC",
     "fileName": "KazakhstanAltaiRC.scs",
     "version": "latest(0.9)",
@@ -4365,7 +4541,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 330,
+    "id": 331,
     "name": "ALTAI - R.O.C RC",
     "fileName": "AltaiRocRC.scs",
     "version": "latest(0.6)",
@@ -4374,7 +4550,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 331,
+    "id": 332,
     "name": "Altai Map",
     "fileName": "Altai_Map 1.7.2.scs",
     "version": "latest(1.7.2)",
@@ -4383,7 +4559,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 332,
+    "id": 333,
     "name": "SibirMap Fix",
     "fileName": "gmc.sibirmap.fix.scs",
     "version": "laetst(1.57-1.0.0)",
@@ -4392,7 +4568,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 333,
+    "id": 334,
     "name": "Kazakhstan - Sibir RC",
     "fileName": "Kazakhstan-SibirRC.scs",
     "version": "latest(1.4)",
@@ -4401,7 +4577,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 334,
+    "id": 335,
     "name": "The Great Steppe - SibirMap Fix",
     "fileName": "TGS Sibirmap Fix.scs",
     "version": "latest(1.4)",
@@ -4410,7 +4586,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 335,
+    "id": 336,
     "name": "Alekseevskoe - Almetyevsk Highway",
     "fileName": "Alekseevskoe_almetyevskoe_addon.scs",
     "version": "latest(1.1)",
@@ -4419,7 +4595,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 336,
+    "id": 337,
     "name": "SibirMap 2.11.2 Support Version for 1.57",
     "fileName": "sibirmap2112sv_157.scs",
     "version": "latest(2.11.2SV)",
@@ -4428,7 +4604,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 337,
+    "id": 338,
     "name": "PM TGS -Kazakhstan RC + Pm TGS Fix",
     "fileName": "KazakhstanTgsRC.scs",
     "version": "latest(0.6)",
@@ -4437,7 +4613,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 338,
+    "id": 339,
     "name": "Road To Aral",
     "fileName": "Road_to_Aral_2.0.scs",
     "version": "latest(2.0-1.57)",
@@ -4446,7 +4622,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 339,
+    "id": 340,
     "name": "Extended Roads (Addon TGS) v0.1.0",
     "fileName": "extended-roads-tgs-v0.1.0.scs",
     "version": "latest(0.1.0)",
@@ -4455,7 +4631,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 340,
+    "id": 341,
     "name": "Promods The Great Steppe 1.5.0 Fix & QoL",
     "fileName": "promods-tgs-fix-qol-v150.scs",
     "version": "1.5.0-1.1",
@@ -4466,7 +4642,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 341,
+    "id": 342,
     "name": "Promods The Great Steppe (Def&Map Package)",
     "fileName": "promods-tgs-repack-v150.scs",
     "version": "latest(1.5repack)",
@@ -4477,7 +4653,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 342,
+    "id": 343,
     "name": "Republic of Kazakhstan Fix (2)",
     "fileName": "rxx.kaz_fix.scs",
     "version": "latest(3.0)",
@@ -4486,7 +4662,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 343,
+    "id": 344,
     "name": "Republic of Kazakhstan FIX",
     "fileName": "Republic of Kazakhstan FIX.scs",
     "version": "latest(1.5)",
@@ -4495,7 +4671,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 344,
+    "id": 345,
     "name": "Republic of Kazakhstan Def",
     "fileName": "kaz def.scs",
     "version": "latest",
@@ -4504,7 +4680,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 345,
+    "id": 346,
     "name": "Republic of Kazakhstan Model",
     "fileName": "kaz model.scs",
     "version": "latest",
@@ -4513,7 +4689,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 346,
+    "id": 347,
     "name": "Caucasus Dream Map Def",
     "fileName": "Caucasus dream map.def.scs",
     "version": "latest(2.7changed)",
@@ -4524,7 +4700,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 347,
+    "id": 348,
     "name": "Caucasus Dream map Model",
     "fileName": "Caucasus dream map model.scs",
     "version": "latest(2.7changed)",
@@ -4535,7 +4711,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 348,
+    "id": 349,
     "name": "Caucasus Dream map Model 2",
     "fileName": "Caucasus dream map model 2.scs",
     "version": "latest(2.7changed)",
@@ -4546,7 +4722,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 349,
+    "id": 350,
     "name": "Horn Of Africa - Def/Map",
     "fileName": "hoa_defmap.scs",
     "version": "latest(1.1.4)",
@@ -4555,7 +4731,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 350,
+    "id": 351,
     "name": "Horn Of Africa - Assets/Models 1",
     "fileName": "hoa_assets1.scs",
     "version": "latest(1.1.4)",
@@ -4564,7 +4740,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 351,
+    "id": 352,
     "name": "Horn Of Africa - Assets/Models 2",
     "fileName": "hoa_assets2.scs",
     "version": "latest(1.1.4)",
@@ -4573,7 +4749,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 352,
+    "id": 353,
     "name": "Heart of Africa",
     "fileName": "Africa_DefMap157.scs",
     "version": "latest(0.2)",
@@ -4582,7 +4758,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 353,
+    "id": 354,
     "name": "Heart Of Africa Assets",
     "fileName": "Africa_AssetsModels157.scs",
     "version": "latest(0.2)",
@@ -4591,7 +4767,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 354,
+    "id": 355,
     "name": "Cape Verde - West Africa Ferry Connection",
     "fileName": "ferry_cv_wa.scs",
     "version": "latest(1.0)",
@@ -4602,7 +4778,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 355,
+    "id": 356,
     "name": "West Africa - Africa Extended RC",
     "fileName": "West Africa - Africa Extended RC.scs",
     "version": "latest(1.3)",
@@ -4611,7 +4787,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 356,
+    "id": 357,
     "name": "RIW - West Africa FIX",
     "fileName": "RIW-WAFIX.scs",
     "version": "latest(1.1)",
@@ -4620,7 +4796,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 357,
+    "id": 358,
     "name": "West Africa",
     "fileName": "west_africa.scs",
     "version": "latest(1.57-0.03)",
@@ -4629,7 +4805,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 358,
+    "id": 359,
     "name": "Africa Extended",
     "fileName": "africa_extended.scs",
     "version": "latest(1.4)",
@@ -4638,7 +4814,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 359,
+    "id": 360,
     "name": "Strassbourg-Metz",
     "fileName": "strasbourg-metz.scs",
     "version": "latest(0.3)",
@@ -4647,7 +4823,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 360,
+    "id": 361,
     "name": "ScandinaviaMod Definition Package",
     "fileName": "zzz.ScandinaviaMod_PM_Expansion-def.scs",
     "version": "latest(0.4.1)",
@@ -4658,7 +4834,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 361,
+    "id": 362,
     "name": "ScandinaviaMod Map Package",
     "fileName": "zzz.ScandinaviaMod_PM_Expansion-map.scs",
     "version": "latest(0.4.1)",
@@ -4669,7 +4845,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 362,
+    "id": 363,
     "name": "Antarctica Map 0.8 DEF",
     "fileName": "mod_antarctica_def.0.8.scs",
     "version": "latest(0.8-1.57)",
@@ -4678,7 +4854,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 363,
+    "id": 364,
     "name": "Antarctica Map 0.8 MAP",
     "fileName": "mod_antarctica_map.0.8.scs",
     "version": "latest(0.8-1.57)",
@@ -4687,7 +4863,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 364,
+    "id": 365,
     "name": "Cape Verde Map",
     "fileName": "cape_verde_map.scs",
     "version": "latest(1.0)",
@@ -4696,7 +4872,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 365,
+    "id": 366,
     "name": "Maldives Map 0.1",
     "fileName": "maldives.scs",
     "version": "latest(0.1-1.57)",
@@ -4705,7 +4881,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 366,
+    "id": 367,
     "name": "Russian Isles",
     "fileName": "Russian_Isles.scs",
     "version": "latest(1.0)",
@@ -4714,7 +4890,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 367,
+    "id": 368,
     "name": "Bearisland1.0",
     "fileName": "bimap.scs",
     "version": "latest(1.57-1.0)",
@@ -4723,7 +4899,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 368,
+    "id": 369,
     "name": "Project Comoros 1.55-1.0",
     "fileName": "xiaoan.pjcom.scs",
     "version": "not latest(1.55-1.0)",
@@ -4732,7 +4908,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 369,
+    "id": 370,
     "name": "Nauru Map",
     "fileName": "Nauru Map.scs",
     "version": "latest(1.1fix)",
@@ -4741,7 +4917,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 370,
+    "id": 371,
     "name": "Wakkanai Map",
     "fileName": "Wakkanai_Map1.2.scs",
     "version": "latest(1.2)",
@@ -4750,7 +4926,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 371,
+    "id": 372,
     "name": "ProAustralia",
     "fileName": "ProAustralia.scs",
     "version": "latest(1.1)",
@@ -4759,7 +4935,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 372,
+    "id": 373,
     "name": "Project Caribbean",
     "fileName": "Project Caribbean.scs",
     "version": "latest(1.1)",
@@ -4768,7 +4944,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 373,
+    "id": 374,
     "name": "Point Nemo",
     "fileName": "Point_Nemo.scs",
     "version": "latest(1.0)",
@@ -4777,7 +4953,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 374,
+    "id": 375,
     "name": "Australia Tasmania Map FIX",
     "fileName": "Australia Tasmania map FIX.scs",
     "version": "latest(1.3_lhd)",
@@ -4786,7 +4962,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 375,
+    "id": 376,
     "name": "Australia Tasmania def",
     "fileName": "Australia Tasmania map v5.3 def.scs",
     "version": "latest(5.3)",
@@ -4795,7 +4971,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 376,
+    "id": 377,
     "name": "Australia Tasmania model",
     "fileName": "Australia Tasmania map v5.3 model.scs",
     "version": "latest(5.3)",
@@ -4804,7 +4980,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 377,
+    "id": 378,
     "name": "Truck Dream Road Signs Fix",
     "fileName": "gmc.truck_dream_road.sign_fix.scs",
     "version": "latest(1.56-1.0)",
@@ -4813,7 +4989,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 378,
+    "id": 379,
     "name": "Roads Of Chungwa - Truck Dream Road RC",
     "fileName": "Roads of Chunghwa - Truck Dream Road RC.scs",
     "version": "latest(1.2)",
@@ -4822,7 +4998,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 379,
+    "id": 380,
     "name": "Truck Dream Road FIX",
     "fileName": "Truck Dream Road FIX.scs",
     "version": "latest(1.3fix)",
@@ -4831,7 +5007,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 380,
+    "id": 381,
     "name": "【卡车梦之路专属语音导航包】",
     "fileName": "卡车梦之路导航包（必装）.scs",
     "version": "latest(1.43)",
@@ -4840,7 +5016,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 381,
+    "id": 382,
     "name": "CTMV2增强包-1(选装)",
     "fileName": "第二代CTM增强包-1(选装).scs",
     "version": "latest(1.43)",
@@ -4849,7 +5025,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 382,
+    "id": 383,
     "name": "卡车梦之路ui包",
     "fileName": "卡车梦之路ui包.scs",
     "version": "latest(1.43)",
@@ -4858,7 +5034,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 383,
+    "id": 384,
     "name": "卡车梦之路v2",
     "fileName": "卡车梦之路v2.scs",
     "version": "latest(1.43)",
@@ -4867,7 +5043,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 384,
+    "id": 385,
     "name": "Roads Of Chunghwa Traffic Fix",
     "fileName": "gmc.roads_of_chunghwa.traffic_fix.scs",
     "version": "latest(1.56-1.0)",
@@ -4876,7 +5052,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 385,
+    "id": 386,
     "name": "English Cargo Names of ROC",
     "fileName": "ROC_english_cargo_names.scs",
     "version": "latest(1.0)",
@@ -4885,7 +5061,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 386,
+    "id": 387,
     "name": "Ghost Road FIX For Roads Of Chunghwa",
     "fileName": "Ghost Road FIX ROC.scs",
     "version": "latst(1.57-1.1.0)",
@@ -4894,7 +5070,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 387,
+    "id": 388,
     "name": "Roads Of Chungwa FIX",
     "fileName": "Roads of Chunghwa FIX.scs",
     "version": "latest(1.2fix)",
@@ -4903,7 +5079,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 388,
+    "id": 389,
     "name": "R.O.C mod def",
     "fileName": "roc02_251125fix_def.scs",
     "version": "latest(0.5)",
@@ -4912,7 +5088,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 389,
+    "id": 390,
     "name": "R.O.C mod AI def",
     "fileName": "roc02a_ai157_train_def-fix3.scs",
     "version": "latest(0.5)",
@@ -4921,7 +5097,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 390,
+    "id": 391,
     "name": "R.O.C mod UI",
     "fileName": "roc03_250410w_ui.scs",
     "version": "latest(0.5)",
@@ -4930,7 +5106,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 391,
+    "id": 392,
     "name": "R.O.C mod test 1.57",
     "fileName": "roc06_model157.scs",
     "version": "latest(0.5)",
@@ -4939,7 +5115,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 392,
+    "id": 393,
     "name": "R.O.C mod test 1.55",
     "fileName": "roc04a_model156fix2gh.scs",
     "version": "latest(0.5)",
@@ -4948,7 +5124,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 393,
+    "id": 394,
     "name": "R.O.C mod 1.55",
     "fileName": "roc05_model156b.scs",
     "version": "latest(0.5)",
@@ -4957,7 +5133,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 394,
+    "id": 395,
     "name": "Canada Map FIX",
     "fileName": "Canada Map FIX.scs",
     "version": "latest(1.3)",
@@ -4966,7 +5142,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 395,
+    "id": 396,
     "name": "def Canada v 0.2.5",
     "fileName": "Canada v-0.2.5-def.scs",
     "version": "latest(0.2.5)",
@@ -4975,7 +5151,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 396,
+    "id": 397,
     "name": "PJ Indo Vanessa Pashima Land Fix",
     "fileName": "gmc.pjindo.vanemap.fix.scs",
     "version": "latest(1.57-1.0)",
@@ -4984,7 +5160,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 397,
+    "id": 398,
     "name": "PJ Indo Map v2.7 Def & Map",
     "fileName": "PJ_Indo_Def&Map.scs",
     "version": "latest(2.76)",
@@ -4993,7 +5169,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 398,
+    "id": 399,
     "name": "PJ Indo Map v2.7 Assets & Models 1",
     "fileName": "PJ_Indo_Assets&Models1.scs",
     "version": "latest(2.76)",
@@ -5002,7 +5178,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 399,
+    "id": 400,
     "name": "PJ Indo Map v2.7 Assets & Models 2",
     "fileName": "PJ_Indo_Assets&Models2.scs",
     "version": "latest(2.76)",
@@ -5011,7 +5187,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 400,
+    "id": 401,
     "name": "Grand Utopia",
     "fileName": "GU - Grand Utopia (v1.18.5).scs",
     "version": "latest(1.18.5)",
@@ -5020,7 +5196,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 401,
+    "id": 402,
     "name": "HexMap For Europe Module Adaptation(USSR Ver.)",
     "fileName": "HexMap For Europe Module Adaptation(USSR Ver.).scs",
     "version": "latest(HEX1)",
@@ -5029,7 +5205,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 402,
+    "id": 403,
     "name": "HEXMAP_HEX1_RELEASE_1.0",
     "fileName": "hex1_release1.0.scs",
     "version": "latest(HEX1)",
@@ -5038,7 +5214,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 403,
+    "id": 404,
     "name": "European DreamLand",
     "fileName": "rxx.eudl.scs",
     "version": "not latest(1.55-1.1.1)",
@@ -5047,7 +5223,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 404,
+    "id": 405,
     "name": "Dreamland - Def_Model (1)",
     "fileName": "DreamLand_Def_Model.scs",
     "version": "latest(1.5.5)",
@@ -5056,7 +5232,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 405,
+    "id": 406,
     "name": "Dreamland - Model 2 (2)",
     "fileName": "Dreamland_Model_II.scs",
     "version": "latest(1.5.5)",
@@ -5065,7 +5241,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 406,
+    "id": 407,
     "name": "Ghost Road FIX For Winterland",
     "fileName": "Ghost Road FIX Winterland.scs",
     "version": "latst(1.57-1.1.0)",
@@ -5074,7 +5250,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 407,
+    "id": 408,
     "name": "Winterland_HorizonModdingTR",
     "fileName": "Winterland_HorizonModdingTR.zip",
     "version": "latest(1.1)",
@@ -5083,7 +5259,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 408,
+    "id": 409,
     "name": "EAA Map - SEM EUROPA",
     "fileName": "eaa_map_semeuropa_1.57_v6.scs",
     "version": "latest(1.57-v6)",
@@ -5092,7 +5268,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 409,
+    "id": 410,
     "name": "EAA Base",
     "fileName": "eaa_base_1.57_v6.scs",
     "version": "latest(1.57-v6)",
@@ -5101,7 +5277,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 410,
+    "id": 411,
     "name": "EAA Share",
     "fileName": "eaa_base_share_1.57_v6.scs",
     "version": "latest(1.57-v6)",
@@ -5110,7 +5286,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 411,
+    "id": 412,
     "name": "European Bartoland Fix",
     "fileName": "gmc.european_bartoland.fix.scs",
     "version": "latest(1.57-1.1.0)",
@@ -5121,7 +5297,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 412,
+    "id": 413,
     "name": "European Bartoland",
     "fileName": "European Bartoland.scs",
     "version": "latest(1.0.1)",
@@ -5130,7 +5306,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 413,
+    "id": 414,
     "name": "BartolandPrem",
     "fileName": "BartolandPrem.scs",
     "version": "latest(2.9)",
@@ -5139,7 +5315,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 414,
+    "id": 415,
     "name": "VaneMap FIX",
     "fileName": "VaneMap FIX.scs",
     "version": "latest(1.1.1)",
@@ -5148,7 +5324,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 415,
+    "id": 416,
     "name": "Vanessa Pashima Land",
     "fileName": "vanemap7.scs",
     "version": "latest(V7)",
@@ -5157,7 +5333,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 416,
+    "id": 417,
     "name": "2K24 TURKEY MAP PREFAB 157.0",
     "fileName": "2k24_turkey_map_prefab_157.zip",
     "version": "latest(157.0)",
@@ -5166,7 +5342,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 417,
+    "id": 418,
     "name": "2K24 TURKEY MODEL 01 157.0",
     "fileName": "2k24_turkey_model_01_157.scs",
     "version": "latest(157.0)",
@@ -5175,7 +5351,7 @@ document.onkeydown = function(e) {
     "downloadCount": 0
   },
   {
-    "id": 418,
+    "id": 419,
     "name": "2K24 TURKEY MODEL 02 157.0",
     "fileName": "2k24_turkey_model_02_157.scs",
     "version": "latest(157.0)",
@@ -5280,6 +5456,22 @@ document.onkeydown = function(e) {
                 }
                 
                 const row = document.createElement('tr');
+                
+                // ==== 添加行高亮样式（根据状态）====
+                // 清除可能存在的其他状态类
+                row.className = '';
+                
+                // 为不同状态添加对应的行高亮类
+                // 优先级：新增 > 更新 > 移动
+                if (mod.status.includes('new')) {
+                    row.classList.add('row-highlight-new');
+                } else if (mod.status.includes('updated')) {
+                    row.classList.add('row-highlight-updated');
+                } else if (mod.status.includes('moved')) {
+                    row.classList.add('row-highlight-moved');
+                }
+                // 删除状态不添加高亮（保持原样）
+                // ================================
                 
                 // 序号列
                 const indexCell = document.createElement('td');
@@ -5491,32 +5683,183 @@ document.onkeydown = function(e) {
             });
         }
 
-        // 设置统计按钮筛选功能
+        // --- 新增：拖拽缩放弹窗管理 ---
+        function createStatusDialog(title, statusType, items, canJump = true) {
+            const container = document.getElementById('dialogContainer');
+            const dialogId = 'dialog_' + statusType + '_' + Date.now();
+            const dialog = document.createElement('div');
+            dialog.className = 'status-dialog';
+            dialog.id = dialogId;
+            dialog.style.top = (100 + Math.random() * 50) + 'px';
+            dialog.style.left = (100 + Math.random() * 50) + 'px';
+            dialog.style.width = '400px';
+            dialog.style.height = '450px';
+            dialog.setAttribute('data-status', statusType);
+            
+            // 头部
+            const header = document.createElement('div');
+            header.className = 'dialog-header';
+            header.innerHTML = `
+                <span class="dialog-title">
+                    <i class="fas ${statusType === 'updated' ? 'fa-sync-alt' : statusType === 'new' ? 'fa-plus-circle' : statusType === 'moved' ? 'fa-arrows-alt' : 'fa-trash-alt'}"></i>
+                    ${title} (${items.length})
+                </span>
+                <button class="dialog-close" aria-label="关闭"><i class="fas fa-times"></i></button>
+            `;
+            
+            // 内容区
+            const content = document.createElement('div');
+            content.className = 'dialog-content';
+            
+            items.forEach(mod => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'dialog-item';
+                // 删除状态不需要跳转
+                if (canJump && statusType !== 'deleted') {
+                    itemDiv.style.cursor = 'pointer';
+                    itemDiv.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        // 跳转到表格对应行：根据mod.id查找并滚动
+                        const rows = document.querySelectorAll('#modsTableBody tr');
+                        for (let row of rows) {
+                            // 通过模组名匹配（更精确可自定义属性，简化：查找包含名称的单元格）
+                            const nameCell = row.cells[1];
+                            if (nameCell && nameCell.textContent.trim() === mod.name) {
+                                row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                // 添加短暂高亮
+                                row.style.transition = 'background 0.3s';
+                                row.style.background = 'rgba(255,149,0,0.3)';
+                                setTimeout(() => row.style.background = '', 800);
+                                break;
+                            }
+                        }
+                    });
+                } else if (statusType === 'deleted') {
+                    // 删除的模组不跳转，只显示
+                    itemDiv.style.cursor = 'default';
+                }
+                itemDiv.innerHTML = `<div class="mod-name">${mod.name}</div><div style="font-size:12px; opacity:0.8;">${mod.fileName}</div>`;
+                content.appendChild(itemDiv);
+            });
+            
+            // 缩放把手
+            const resizeHandle = document.createElement('div');
+            resizeHandle.className = 'dialog-resize-handle';
+            
+            dialog.appendChild(header);
+            dialog.appendChild(content);
+            dialog.appendChild(resizeHandle);
+            container.appendChild(dialog);
+            
+            // 关闭事件
+            const closeBtn = header.querySelector('.dialog-close');
+            closeBtn.addEventListener('click', () => dialog.remove());
+            
+            // ----- 拖拽逻辑 -----
+            let offsetX, offsetY, isDragging = false;
+            header.addEventListener('mousedown', (e) => {
+                if (e.button !== 0) return;
+                e.preventDefault();
+                isDragging = true;
+                const rect = dialog.getBoundingClientRect();
+                offsetX = e.clientX - rect.left;
+                offsetY = e.clientY - rect.top;
+                
+                const onMouseMove = (moveEvent) => {
+                    if (!isDragging) return;
+                    moveEvent.preventDefault();
+                    let newLeft = moveEvent.clientX - offsetX;
+                    let newTop = moveEvent.clientY - offsetY;
+                    // 边界限制
+                    newLeft = Math.max(0, Math.min(window.innerWidth - dialog.offsetWidth, newLeft));
+                    newTop = Math.max(0, Math.min(window.innerHeight - dialog.offsetHeight, newTop));
+                    dialog.style.left = newLeft + 'px';
+                    dialog.style.top = newTop + 'px';
+                };
+                
+                const onMouseUp = () => {
+                    isDragging = false;
+                    window.removeEventListener('mousemove', onMouseMove);
+                    window.removeEventListener('mouseup', onMouseUp);
+                };
+                
+                window.addEventListener('mousemove', onMouseMove);
+                window.addEventListener('mouseup', onMouseUp);
+            });
+            
+            // ----- 缩放逻辑 (右下角) -----
+            resizeHandle.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const startX = e.clientX;
+                const startY = e.clientY;
+                const startWidth = dialog.offsetWidth;
+                const startHeight = dialog.offsetHeight;
+                
+                const onMouseMove = (moveEvent) => {
+                    const deltaX = moveEvent.clientX - startX;
+                    const deltaY = moveEvent.clientY - startY;
+                    const newWidth = Math.max(260, startWidth + deltaX);
+                    const newHeight = Math.max(220, startHeight + deltaY);
+                    dialog.style.width = newWidth + 'px';
+                    dialog.style.height = newHeight + 'px';
+                };
+                
+                const onMouseUp = () => {
+                    window.removeEventListener('mousemove', onMouseMove);
+                    window.removeEventListener('mouseup', onMouseUp);
+                };
+                
+                window.addEventListener('mousemove', onMouseMove);
+                window.addEventListener('mouseup', onMouseUp);
+            });
+            
+            return dialog;
+        }
+
+        // 重写统计按钮筛选功能：点击后弹出窗口，而非仅仅筛选表格
         function setupStatsFilter() {
             const statButtons = document.querySelectorAll('.stat-btn');
             
             statButtons.forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', function(e) {
                     // 移除其他按钮的active类
                     statButtons.forEach(b => b.classList.remove('active'));
-                    
-                    // 添加当前按钮的active类
                     this.classList.add('active');
                     
-                    // 设置筛选
+                    // 根据按钮确定状态类型
+                    let statusType = '';
                     if (this.id === 'totalModsBtn') {
                         currentFilter = 'all';
+                        renderModsTable();
+                        return; // 全部模组不弹窗，仅筛选
                     } else if (this.id === 'updatedModsBtn') {
-                        currentFilter = 'updated';
+                        statusType = 'updated';
                     } else if (this.id === 'newModsBtn') {
-                        currentFilter = 'new';
+                        statusType = 'new';
                     } else if (this.id === 'movedModsBtn') {
-                        currentFilter = 'moved';
+                        statusType = 'moved';
                     } else if (this.id === 'deletedModsBtn') {
-                        currentFilter = 'deleted';
+                        statusType = 'deleted';
                     }
                     
-                    renderModsTable();
+                    // 获取对应状态的模组列表
+                    const filteredMods = modsData.filter(mod => mod.status.includes(statusType));
+                    if (filteredMods.length === 0) {
+                        alert(translations[currentLanguage][statusType] + ' 模组列表为空');
+                        return;
+                    }
+                    
+                    // 状态对应的标题
+                    let title = '';
+                    if (statusType === 'updated') title = translations[currentLanguage].updated;
+                    else if (statusType === 'new') title = translations[currentLanguage].new;
+                    else if (statusType === 'moved') title = translations[currentLanguage].moved;
+                    else if (statusType === 'deleted') title = translations[currentLanguage].deleted;
+                    
+                    // 弹窗 (删除状态不可跳转)
+                    const canJump = (statusType !== 'deleted');
+                    createStatusDialog(title + ' 模组', statusType, filteredMods, canJump);
                 });
             });
         }
@@ -5556,18 +5899,12 @@ document.onkeydown = function(e) {
                 e.stopPropagation();
                 
                 if (currentOpenDropdown === 'archive') {
-                    // 如果当前已经打开，则关闭
                     closeDropdown('archive');
                 } else {
-                    // 关闭其他打开的下拉菜单
                     closeAllDropdowns();
-                    
-                    // 打开当前下拉菜单
                     archiveDropdown.classList.add('show');
                     archiveDropdownBtn.classList.add('active');
                     currentOpenDropdown = 'archive';
-                    
-                    // 显示遮罩层
                     document.getElementById('dropdownOverlay').style.display = 'block';
                 }
             });
@@ -5577,18 +5914,12 @@ document.onkeydown = function(e) {
                 e.stopPropagation();
                 
                 if (currentOpenDropdown === 'sortMap') {
-                    // 如果当前已经打开，则关闭
                     closeDropdown('sortMap');
                 } else {
-                    // 关闭其他打开的下拉菜单
                     closeAllDropdowns();
-                    
-                    // 打开当前下拉菜单
                     sortMapDropdown.classList.add('show');
                     sortMapDropdownBtn.classList.add('active');
                     currentOpenDropdown = 'sortMap';
-                    
-                    // 显示遮罩层
                     document.getElementById('dropdownOverlay').style.display = 'block';
                 }
             });
@@ -5598,7 +5929,6 @@ document.onkeydown = function(e) {
             dropdownLinks.forEach(link => {
                 link.addEventListener('click', function(e) {
                     // 点击链接时，不关闭下拉菜单，让链接正常跳转
-                    // 但可以在这里添加其他逻辑，比如统计点击等
                 });
             });
         }
@@ -5617,8 +5947,6 @@ document.onkeydown = function(e) {
             });
             
             currentOpenDropdown = null;
-            
-            // 隐藏遮罩层
             document.getElementById('dropdownOverlay').style.display = 'none';
         }
 
@@ -5631,10 +5959,7 @@ document.onkeydown = function(e) {
                 document.getElementById('sortMapDropdown').classList.remove('show');
                 document.getElementById('sortMapDropdownBtn').classList.remove('active');
             }
-            
             currentOpenDropdown = null;
-            
-            // 隐藏遮罩层
             document.getElementById('dropdownOverlay').style.display = 'none';
         }
 
@@ -5642,20 +5967,16 @@ document.onkeydown = function(e) {
         function setupClickOutsideToClose() {
             const dropdownOverlay = document.getElementById('dropdownOverlay');
             
-            // 点击遮罩层关闭下拉菜单
             dropdownOverlay.addEventListener('click', function() {
                 closeAllDropdowns();
             });
             
-            // 点击页面其他地方关闭下拉菜单
             document.addEventListener('click', function(e) {
-                // 如果点击的不是下拉菜单相关元素
                 if (!e.target.closest('.dropdown')) {
                     closeAllDropdowns();
                 }
             });
             
-            // 点击下拉菜单内部不会关闭
             const dropdownContents = document.querySelectorAll('.dropdown-content');
             dropdownContents.forEach(content => {
                 content.addEventListener('click', function(e) {
@@ -5669,24 +5990,19 @@ document.onkeydown = function(e) {
             const scrollTopBtn = document.getElementById('scrollTopBtn');
             const themeToggleBtn = document.getElementById('themeToggleBtn');
             
-            // 滚动显示/隐藏返回顶部按钮
             window.addEventListener('scroll', function() {
                 if (window.pageYOffset > 300) {
                     scrollTopBtn.classList.add('visible');
                 } else {
                     scrollTopBtn.classList.remove('visible');
                 }
-                
-                // 主题切换按钮一直显示
                 themeToggleBtn.classList.add('visible');
             });
             
-            // 返回顶部功能
             scrollTopBtn.addEventListener('click', function() {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
             
-            // 主题切换功能
             const isLightMode = localStorage.getItem('ets2ModTheme') === 'light';
             if (isLightMode) {
                 document.body.classList.add('light-mode');
