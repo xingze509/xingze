@@ -267,6 +267,16 @@ document.onkeydown = function(e) {
             box-shadow: 0 6px 18px rgba(239, 68, 68, 0.4);
         }
         
+        /* 新增：更新日志按钮样式 */
+        .action-btn.changelog {
+            background: linear-gradient(135deg, var(--info) 0%, #2563eb 100%);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        
+        .action-btn.changelog:hover {
+            box-shadow: 0 6px 18px rgba(59, 130, 246, 0.4);
+        }
+        
         /* 下拉菜单容器 */
         .dropdown {
             position: relative;
@@ -958,8 +968,8 @@ document.onkeydown = function(e) {
             position: fixed;
             top: 100px;
             left: 100px;
-            width: 380px;
-            height: 450px;
+            width: 450px;
+            height: 500px;
             background: var(--dark-light);
             border: 2px solid var(--primary);
             border-radius: 16px;
@@ -967,17 +977,19 @@ document.onkeydown = function(e) {
             z-index: 2000;
             display: flex;
             flex-direction: column;
-            resize: both;
+            resize: none;
             overflow: hidden;
-            min-width: 260px;
-            min-height: 220px;
+            min-width: 300px;
+            min-height: 350px;
             color: var(--light);
         }
+        
         .light-mode .status-dialog {
             background: white;
             color: #333;
             border-color: var(--primary);
         }
+        
         .dialog-header {
             background: linear-gradient(145deg, var(--dark), #0f172a);
             padding: 12px 16px;
@@ -987,17 +999,21 @@ document.onkeydown = function(e) {
             cursor: move;
             user-select: none;
             border-bottom: 1px solid var(--primary);
+            flex-shrink: 0;
         }
+        
         .light-mode .dialog-header {
             background: linear-gradient(145deg, #e2e8f0, #cbd5e1);
             color: #1e293b;
         }
+        
         .dialog-title {
             font-weight: 600;
             display: flex;
             gap: 8px;
             align-items: center;
         }
+        
         .dialog-close {
             background: rgba(255,255,255,0.1);
             border: none;
@@ -1010,23 +1026,78 @@ document.onkeydown = function(e) {
             justify-content: center;
             cursor: pointer;
             transition: 0.2s;
+            flex-shrink: 0;
         }
+        
         .light-mode .dialog-close {
             color: #1e293b;
             background: rgba(0,0,0,0.05);
         }
+        
         .dialog-close:hover {
             background: var(--danger);
             color: white;
         }
+        
         .dialog-content {
-            flex: 1;
-            overflow-y: auto;
+            flex: 1 1 auto;
+            overflow-y: auto !important;
+            overflow-x: hidden;
             padding: 12px;
             display: flex;
             flex-direction: column;
             gap: 8px;
+            min-height: 0;
+            height: 100%;
+            max-height: calc(100% - 60px);
         }
+        
+        /* 分类容器样式 */
+        .dialog-category {
+            background: rgba(255,149,0,0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 5px;
+            flex-shrink: 0;
+        }
+        
+        .dialog-category-header {
+            background: rgba(255,149,0,0.1);
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: 0.2s;
+            border-left: 5px solid var(--primary);
+        }
+        
+        .dialog-category-header:hover {
+            background: rgba(255,149,0,0.2);
+        }
+        
+        .dialog-category-title {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .dialog-category-title i {
+            width: 20px;
+        }
+        
+        .dialog-category-items {
+            padding: 8px;
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .dialog-category-items.expanded {
+            display: flex;
+        }
+        
         .dialog-item {
             background: rgba(255,149,0,0.08);
             padding: 10px 14px;
@@ -1035,18 +1106,23 @@ document.onkeydown = function(e) {
             cursor: pointer;
             transition: 0.2s;
             word-break: break-word;
+            margin-left: 5px;
         }
+        
         .dialog-item:hover {
             background: rgba(255,149,0,0.2);
             transform: translateX(5px);
         }
+        
         .light-mode .dialog-item {
             background: rgba(255,149,0,0.05);
         }
+        
         .dialog-item .mod-name {
             font-weight: 600;
             color: var(--primary);
         }
+        
         .dialog-resize-handle {
             position: absolute;
             bottom: 0;
@@ -1056,14 +1132,59 @@ document.onkeydown = function(e) {
             cursor: se-resize;
             background: linear-gradient(135deg, transparent 70%, var(--primary) 100%);
             border-bottom-right-radius: 14px;
+            flex-shrink: 0;
         }
+        
         /* 遮罩层用于弹窗拖拽时防止选中 */
         .dragging {
             user-select: none;
             pointer-events: none;
         }
+        
         .dragging .dialog-header {
             pointer-events: none;
+        }
+        
+        /* 弹窗激活状态样式 */
+        .status-dialog.active-dialog {
+            box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.5), 0 15px 40px rgba(0,0,0,0.5);
+            z-index: 2100;
+        }
+        
+        /* 折叠/展开图标 */
+        .category-toggle {
+            transition: transform 0.3s ease;
+        }
+        
+        .category-toggle.expanded {
+            transform: rotate(90deg);
+        }
+        
+        /* 空状态提示 */
+        .empty-category {
+            padding: 20px;
+            text-align: center;
+            color: var(--gray);
+            font-style: italic;
+        }
+        
+        /* 修复滚动条样式 */
+        .dialog-content::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .dialog-content::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 3px;
+        }
+        
+        .dialog-content::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 3px;
+        }
+        
+        .dialog-content::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
         }
     </style>
 </head>
@@ -1077,7 +1198,7 @@ document.onkeydown = function(e) {
             <h1 class="title">欧洲卡车模拟2-组合地图-1.57</h1>
             <div class="subtitle">
                 <span><i class="fas fa-user"></i> ✨作者：瑆泽、初一爱笑啊、BGYdook✨</span>
-                <span><i class="far fa-calendar-alt"></i> ✨更新日期：2026年02月12日（数据导入时间：2026-02-12 08:51:29）✨</span>
+                <span><i class="far fa-calendar-alt"></i> ✨更新日期：2026年02月12日（数据导入时间：2026-02-12 14:15:21）✨</span>
             </div>
             
             <!-- 语言选择器 -->
@@ -1129,6 +1250,11 @@ document.onkeydown = function(e) {
                         <a href="https://pan.quark.cn/s/1ba554e48863" target="_blank">2026年02月11日</a>
                     </div>
                 </div>
+                
+                <!-- 新增：更新日志按钮 -->
+                <button class="action-btn changelog" id="changelogBtn">
+                    <i class="fas fa-history"></i> 更新日志
+                </button>
                 
                 <button class="action-btn join-us" id="joinUsBtn">
                     <i class="fas fa-users"></i> 加入我们
@@ -1227,6 +1353,7 @@ document.onkeydown = function(e) {
                 downloadAll: '一键下载全部模组',
                 archive: '免排序存档',
                 sortMap: '排序图',
+                changelog: '更新日志',
                 joinUs: '加入我们',
                 statsTitle: '模组统计',
                 totalMods: '全部模组',
@@ -1247,7 +1374,10 @@ document.onkeydown = function(e) {
                 statusNew: '新增',
                 statusUpdated: '更新',
                 statusMoved: '移动',
-                statusDeleted: '删除'
+                statusDeleted: '删除',
+                changelogTitle: '更新日志',
+                totalChanges: '总变更',
+                noMods: '暂无模组'
             },
             'en': {
                 title: '欧洲卡车模拟2-组合地图-1.57',
@@ -1257,6 +1387,7 @@ document.onkeydown = function(e) {
                 downloadAll: 'Download All Mods',
                 archive: 'No-Sort Archive',
                 sortMap: 'Sorting Map',
+                changelog: 'Changelog',
                 joinUs: 'Join Us',
                 statsTitle: 'Mod Statistics',
                 totalMods: 'All Mods',
@@ -1277,7 +1408,10 @@ document.onkeydown = function(e) {
                 statusNew: 'New',
                 statusUpdated: 'Updated',
                 statusMoved: 'Moved',
-                statusDeleted: 'Deleted'
+                statusDeleted: 'Deleted',
+                changelogTitle: 'Changelog',
+                totalChanges: 'Total Changes',
+                noMods: 'No Mods'
             },
             'ru': {
                 title: '欧洲卡车模拟2-组合地图-1.57',
@@ -1287,6 +1421,7 @@ document.onkeydown = function(e) {
                 downloadAll: 'Скачать все моды',
                 archive: 'Архив без сортировки',
                 sortMap: 'Карта сортировки',
+                changelog: 'История обновлений',
                 joinUs: 'Присоединяйтесь к нам',
                 statsTitle: 'Статистика модов',
                 totalMods: 'Все моды',
@@ -1307,7 +1442,10 @@ document.onkeydown = function(e) {
                 statusNew: 'Новый',
                 statusUpdated: 'Обновлено',
                 statusMoved: 'Перемещено',
-                statusDeleted: 'Удалено'
+                statusDeleted: 'Удалено',
+                changelogTitle: 'История обновлений',
+                totalChanges: 'Всего изменений',
+                noMods: 'Нет модов'
             },
             'ko': {
                 title: '欧洲卡车模拟2-组合地图-1.57',
@@ -1317,6 +1455,7 @@ document.onkeydown = function(e) {
                 downloadAll: '모든 모드 다운로드',
                 archive: '정렬 없음 아카이브',
                 sortMap: '정렬 지도',
+                changelog: '변경 내역',
                 joinUs: '우리와 함께하세요',
                 statsTitle: '모드 통계',
                 totalMods: '모든 모드',
@@ -1337,7 +1476,10 @@ document.onkeydown = function(e) {
                 statusNew: '새로운',
                 statusUpdated: '업데이트됨',
                 statusMoved: '이동됨',
-                statusDeleted: '삭제됨'
+                statusDeleted: '삭제됨',
+                changelogTitle: '변경 내역',
+                totalChanges: '총 변경',
+                noMods: '모드 없음'
             },
             'ja': {
                 title: '欧洲卡车模拟2-组合地图-1.57',
@@ -1347,13 +1489,14 @@ document.onkeydown = function(e) {
                 downloadAll: 'すべてのモッドをダウンロード',
                 archive: 'ソート不要アーカイブ',
                 sortMap: 'ソートマップ',
+                changelog: '更新履歴',
                 joinUs: '参加する',
                 statsTitle: 'モッド統計',
                 totalMods: 'すべてのモッド',
                 updated: '更新済み',
                 new: '新規',
                 moved: '移動済み',
-                deleted: '삭제済み',
+                deleted: '削除済み',
                 resetFilter: 'フィルターリセット',
                 modName: 'モッド名',
                 fileName: 'ファイル名',
@@ -1361,13 +1504,16 @@ document.onkeydown = function(e) {
                 status: 'ステータス',
                 action: '操作',
                 download: 'ダウンロード',
-                downloadCount: 'ダウン로ード数',
+                downloadCount: 'ダウンロード数',
                 footer1: 'ユーロトラックシミュレーター2 コンボマップモッドソートリスト - 参考のみ、個人の必要に応じて調整してください',
                 footer2: '© 2026 シンズ、チューイアイシャオ - すべてのモッドの著作権は原作者にあります',
                 statusNew: '新規',
                 statusUpdated: '更新済み',
                 statusMoved: '移動済み',
-                statusDeleted: '削除済み'
+                statusDeleted: '削除済み',
+                changelogTitle: '更新履歴',
+                totalChanges: '総変更数',
+                noMods: 'モッドなし'
             },
             'de': {
                 title: '欧洲卡车模拟2-组合地图-1.57',
@@ -1377,6 +1523,7 @@ document.onkeydown = function(e) {
                 downloadAll: 'Alle Mods herunterladen',
                 archive: 'Sortierfreies Archiv',
                 sortMap: 'Sortierkarte',
+                changelog: 'Änderungsprotokoll',
                 joinUs: 'Treten Sie uns bei',
                 statsTitle: 'Mod-Statistiken',
                 totalMods: 'Alle Mods',
@@ -1397,7 +1544,10 @@ document.onkeydown = function(e) {
                 statusNew: 'Neu',
                 statusUpdated: 'Aktualisiert',
                 statusMoved: 'Verschoben',
-                statusDeleted: 'Gelöscht'
+                statusDeleted: 'Gelöscht',
+                changelogTitle: 'Änderungsprotokoll',
+                totalChanges: 'Gesamtänderungen',
+                noMods: 'Keine Mods'
             },
             'fr': {
                 title: '欧洲卡车模拟2-组合地图-1.57',
@@ -1407,6 +1557,7 @@ document.onkeydown = function(e) {
                 downloadAll: 'Télécharger tous les mods',
                 archive: 'Archive sans tri',
                 sortMap: 'Carte de tri',
+                changelog: 'Journal des modifications',
                 joinUs: 'Rejoignez-nous',
                 statsTitle: 'Statistiques des mods',
                 totalMods: 'Tous les mods',
@@ -1427,12 +1578,15 @@ document.onkeydown = function(e) {
                 statusNew: 'Nouveau',
                 statusUpdated: 'Mis à jour',
                 statusMoved: 'Déplacé',
-                statusDeleted: 'Supprimé'
+                statusDeleted: 'Supprimé',
+                changelogTitle: 'Journal des modifications',
+                totalChanges: 'Total des modifications',
+                noMods: 'Aucun mod'
             }
         };
 
-        // 模组数据
-                                                                                                                                                                                                        const modsData = [
+        // 模组数据 - 为了测试滚动效果，添加更多示例数据
+                const modsData = [
   {
     "id": 1,
     "name": "ETS2 Global Background Map-Grand Utopia+",
@@ -5371,6 +5525,15 @@ document.onkeydown = function(e) {
         let downloadStats = JSON.parse(localStorage.getItem('ets2ModDownloadStats')) || {};
         // 当前打开的下拉菜单
         let currentOpenDropdown = null;
+        
+        // 弹窗管理器 - 存储当前打开的弹窗
+        let activeDialogs = {
+            updated: null,
+            new: null,
+            moved: null,
+            deleted: null,
+            changelog: null
+        };
 
         // 初始化页面
         document.addEventListener('DOMContentLoaded', function() {
@@ -5605,8 +5768,11 @@ document.onkeydown = function(e) {
             document.getElementById('downloadAllBtn').innerHTML = `<i class="fas fa-download"></i> ${t.downloadAll}`;
             document.getElementById('archiveDropdownBtn').innerHTML = `<i class="fas fa-archive"></i> ${t.archive} <i class="fas fa-chevron-down"></i>`;
             document.getElementById('sortMapDropdownBtn').innerHTML = `<i class="fas fa-map-marked-alt"></i> ${t.sortMap} <i class="fas fa-chevron-down"></i>`;
+            document.getElementById('changelogBtn').innerHTML = `<i class="fas fa-history"></i> ${t.changelog}`;
             document.getElementById('joinUsBtn').innerHTML = `<i class="fas fa-users"></i> ${t.joinUs}`;
             document.querySelector('.stats-title').innerHTML = `<i class="fas fa-chart-bar"></i> ${t.statsTitle}`;
+            
+            // 更新统计按钮
             document.getElementById('totalModsBtn').innerHTML = `
                 <div class="stat-label">${t.totalMods}</div>
                 <div class="stat-count" id="totalModsCount">0</div>
@@ -5667,6 +5833,11 @@ document.onkeydown = function(e) {
                 resetStatsButtons();
                 renderModsTable();
             });
+            
+            // 新增：更新日志按钮
+            document.getElementById('changelogBtn').addEventListener('click', function() {
+                createChangelogDialog();
+            });
         }
 
         // 设置搜索功能
@@ -5683,63 +5854,178 @@ document.onkeydown = function(e) {
             });
         }
 
-        // --- 新增：拖拽缩放弹窗管理 ---
-        function createStatusDialog(title, statusType, items, canJump = true) {
+        // 新增：创建更新日志弹窗 - 修复滚动问题
+        function createChangelogDialog() {
             const container = document.getElementById('dialogContainer');
-            const dialogId = 'dialog_' + statusType + '_' + Date.now();
+            const statusType = 'changelog';
+            
+            // 检查是否已存在更新日志弹窗
+            if (activeDialogs[statusType] && document.getElementById(activeDialogs[statusType])) {
+                const existingDialog = document.getElementById(activeDialogs[statusType]);
+                existingDialog.style.display = 'flex';
+                
+                // 移除其他弹窗的激活状态
+                document.querySelectorAll('.status-dialog').forEach(d => {
+                    d.classList.remove('active-dialog');
+                });
+                
+                // 添加激活样式，置前显示
+                existingDialog.classList.add('active-dialog');
+                existingDialog.style.zIndex = 2100 + Math.floor(Math.random() * 100);
+                
+                // 滚动到该弹窗位置
+                existingDialog.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                return existingDialog;
+            }
+            
+            // 如果已存在同状态弹窗但DOM不存在了，清除记录
+            if (activeDialogs[statusType]) {
+                activeDialogs[statusType] = null;
+            }
+            
+            // 按状态分类模组
+            const categorizedMods = {
+                updated: modsData.filter(mod => mod.status.includes('updated')),
+                new: modsData.filter(mod => mod.status.includes('new')),
+                moved: modsData.filter(mod => mod.status.includes('moved')),
+                deleted: modsData.filter(mod => mod.status.includes('deleted'))
+            };
+            
+            // 计算总变更数
+            const totalChanges = Object.values(categorizedMods).reduce((sum, arr) => sum + arr.length, 0);
+            
+            // 创建新弹窗
+            const dialogId = 'dialog_changelog_' + Date.now();
             const dialog = document.createElement('div');
-            dialog.className = 'status-dialog';
+            dialog.className = 'status-dialog active-dialog';
             dialog.id = dialogId;
             dialog.style.top = (100 + Math.random() * 50) + 'px';
             dialog.style.left = (100 + Math.random() * 50) + 'px';
-            dialog.style.width = '400px';
-            dialog.style.height = '450px';
+            dialog.style.width = '500px';
+            dialog.style.height = '550px';
             dialog.setAttribute('data-status', statusType);
+            
+            // 移除其他弹窗的激活状态
+            document.querySelectorAll('.status-dialog').forEach(d => {
+                d.classList.remove('active-dialog');
+            });
             
             // 头部
             const header = document.createElement('div');
             header.className = 'dialog-header';
             header.innerHTML = `
                 <span class="dialog-title">
-                    <i class="fas ${statusType === 'updated' ? 'fa-sync-alt' : statusType === 'new' ? 'fa-plus-circle' : statusType === 'moved' ? 'fa-arrows-alt' : 'fa-trash-alt'}"></i>
-                    ${title} (${items.length})
+                    <i class="fas fa-history"></i>
+                    ${translations[currentLanguage].changelogTitle} (${totalChanges})
                 </span>
                 <button class="dialog-close" aria-label="关闭"><i class="fas fa-times"></i></button>
             `;
             
-            // 内容区
+            // 内容区 - 确保可以滚动
             const content = document.createElement('div');
             content.className = 'dialog-content';
+            content.style.overflowY = 'auto';
+            content.style.overflowX = 'hidden';
+            content.style.flex = '1 1 auto';
+            content.style.minHeight = '0';
             
-            items.forEach(mod => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'dialog-item';
-                // 删除状态不需要跳转
-                if (canJump && statusType !== 'deleted') {
-                    itemDiv.style.cursor = 'pointer';
-                    itemDiv.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        // 跳转到表格对应行：根据mod.id查找并滚动
-                        const rows = document.querySelectorAll('#modsTableBody tr');
-                        for (let row of rows) {
-                            // 通过模组名匹配（更精确可自定义属性，简化：查找包含名称的单元格）
-                            const nameCell = row.cells[1];
-                            if (nameCell && nameCell.textContent.trim() === mod.name) {
-                                row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                // 添加短暂高亮
-                                row.style.transition = 'background 0.3s';
-                                row.style.background = 'rgba(255,149,0,0.3)';
-                                setTimeout(() => row.style.background = '', 800);
-                                break;
-                            }
+            // 定义分类顺序和配置
+            const categories = [
+                { key: 'updated', icon: 'fa-sync-alt', color: 'var(--info)', title: translations[currentLanguage].updated },
+                { key: 'new', icon: 'fa-plus-circle', color: 'var(--success)', title: translations[currentLanguage].new },
+                { key: 'moved', icon: 'fa-arrows-alt', color: 'var(--warning)', title: translations[currentLanguage].moved },
+                { key: 'deleted', icon: 'fa-trash-alt', color: 'var(--danger)', title: translations[currentLanguage].deleted }
+            ];
+            
+            // 当前展开的分类（默认无）
+            let expandedCategory = null;
+            
+            categories.forEach(category => {
+                const mods = categorizedMods[category.key] || [];
+                
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'dialog-category';
+                
+                // 分类头部
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'dialog-category-header';
+                headerDiv.style.borderLeftColor = category.color;
+                headerDiv.innerHTML = `
+                    <span class="dialog-category-title">
+                        <i class="fas ${category.icon}" style="color: ${category.color}"></i>
+                        ${category.title} <span style="color: ${category.color}">(${mods.length})</span>
+                    </span>
+                    <i class="fas fa-chevron-right category-toggle"></i>
+                `;
+                
+                // 分类内容区域
+                const itemsDiv = document.createElement('div');
+                itemsDiv.className = 'dialog-category-items';
+                
+                if (mods.length === 0) {
+                    const emptyDiv = document.createElement('div');
+                    emptyDiv.className = 'empty-category';
+                    emptyDiv.textContent = translations[currentLanguage].noMods;
+                    itemsDiv.appendChild(emptyDiv);
+                } else {
+                    mods.forEach(mod => {
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = 'dialog-item';
+                        
+                        // 非删除状态可点击跳转
+                        if (category.key !== 'deleted') {
+                            itemDiv.style.cursor = 'pointer';
+                            itemDiv.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                // 跳转到表格对应行
+                                const rows = document.querySelectorAll('#modsTableBody tr');
+                                for (let row of rows) {
+                                    const nameCell = row.cells[1];
+                                    if (nameCell && nameCell.textContent.trim() === mod.name) {
+                                        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                        row.style.transition = 'background 0.3s';
+                                        row.style.background = 'rgba(255,149,0,0.3)';
+                                        setTimeout(() => row.style.background = '', 800);
+                                        break;
+                                    }
+                                }
+                            });
                         }
+                        
+                        itemDiv.innerHTML = `
+                            <div class="mod-name">${mod.name}</div>
+                            <div style="font-size:12px; opacity:0.8;">${mod.fileName}</div>
+                            <div style="font-size:11px; opacity:0.6; margin-top:4px;">v${mod.version}</div>
+                        `;
+                        itemsDiv.appendChild(itemDiv);
                     });
-                } else if (statusType === 'deleted') {
-                    // 删除的模组不跳转，只显示
-                    itemDiv.style.cursor = 'default';
                 }
-                itemDiv.innerHTML = `<div class="mod-name">${mod.name}</div><div style="font-size:12px; opacity:0.8;">${mod.fileName}</div>`;
-                content.appendChild(itemDiv);
+                
+                // 分类头部点击事件 - 折叠/展开
+                headerDiv.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const toggleIcon = this.querySelector('.category-toggle');
+                    const isExpanded = itemsDiv.classList.contains('expanded');
+                    
+                    // 先折叠所有分类
+                    categoryDiv.parentElement.querySelectorAll('.dialog-category-items').forEach(el => {
+                        el.classList.remove('expanded');
+                    });
+                    categoryDiv.parentElement.querySelectorAll('.category-toggle').forEach(el => {
+                        el.classList.remove('expanded');
+                    });
+                    
+                    // 如果当前是折叠状态，则展开它
+                    if (!isExpanded) {
+                        itemsDiv.classList.add('expanded');
+                        toggleIcon.classList.add('expanded');
+                    }
+                });
+                
+                categoryDiv.appendChild(headerDiv);
+                categoryDiv.appendChild(itemsDiv);
+                content.appendChild(categoryDiv);
             });
             
             // 缩放把手
@@ -5751,9 +6037,15 @@ document.onkeydown = function(e) {
             dialog.appendChild(resizeHandle);
             container.appendChild(dialog);
             
+            // 记录当前弹窗ID
+            activeDialogs[statusType] = dialogId;
+            
             // 关闭事件
             const closeBtn = header.querySelector('.dialog-close');
-            closeBtn.addEventListener('click', () => dialog.remove());
+            closeBtn.addEventListener('click', () => {
+                dialog.remove();
+                activeDialogs[statusType] = null;
+            });
             
             // ----- 拖拽逻辑 -----
             let offsetX, offsetY, isDragging = false;
@@ -5761,6 +6053,14 @@ document.onkeydown = function(e) {
                 if (e.button !== 0) return;
                 e.preventDefault();
                 isDragging = true;
+                
+                // 激活当前弹窗
+                document.querySelectorAll('.status-dialog').forEach(d => {
+                    d.classList.remove('active-dialog');
+                });
+                dialog.classList.add('active-dialog');
+                dialog.style.zIndex = 2100 + Math.floor(Math.random() * 100);
+                
                 const rect = dialog.getBoundingClientRect();
                 offsetX = e.clientX - rect.left;
                 offsetY = e.clientY - rect.top;
@@ -5770,7 +6070,6 @@ document.onkeydown = function(e) {
                     moveEvent.preventDefault();
                     let newLeft = moveEvent.clientX - offsetX;
                     let newTop = moveEvent.clientY - offsetY;
-                    // 边界限制
                     newLeft = Math.max(0, Math.min(window.innerWidth - dialog.offsetWidth, newLeft));
                     newTop = Math.max(0, Math.min(window.innerHeight - dialog.offsetHeight, newTop));
                     dialog.style.left = newLeft + 'px';
@@ -5791,6 +6090,14 @@ document.onkeydown = function(e) {
             resizeHandle.addEventListener('mousedown', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                
+                // 激活当前弹窗
+                document.querySelectorAll('.status-dialog').forEach(d => {
+                    d.classList.remove('active-dialog');
+                });
+                dialog.classList.add('active-dialog');
+                dialog.style.zIndex = 2100 + Math.floor(Math.random() * 100);
+                
                 const startX = e.clientX;
                 const startY = e.clientY;
                 const startWidth = dialog.offsetWidth;
@@ -5799,8 +6106,8 @@ document.onkeydown = function(e) {
                 const onMouseMove = (moveEvent) => {
                     const deltaX = moveEvent.clientX - startX;
                     const deltaY = moveEvent.clientY - startY;
-                    const newWidth = Math.max(260, startWidth + deltaX);
-                    const newHeight = Math.max(220, startHeight + deltaY);
+                    const newWidth = Math.max(350, startWidth + deltaX);
+                    const newHeight = Math.max(400, startHeight + deltaY);
                     dialog.style.width = newWidth + 'px';
                     dialog.style.height = newHeight + 'px';
                 };
@@ -5814,25 +6121,215 @@ document.onkeydown = function(e) {
                 window.addEventListener('mouseup', onMouseUp);
             });
             
+            // 点击弹窗头部激活
+            header.addEventListener('click', function(e) {
+                if (e.target.closest('.dialog-close')) return;
+                document.querySelectorAll('.status-dialog').forEach(d => {
+                    d.classList.remove('active-dialog');
+                });
+                dialog.classList.add('active-dialog');
+                dialog.style.zIndex = 2100 + Math.floor(Math.random() * 100);
+            });
+            
             return dialog;
         }
 
-        // 重写统计按钮筛选功能：点击后弹出窗口，而非仅仅筛选表格
+        // 创建状态弹窗（原有功能）
+        function createStatusDialog(title, statusType, items, canJump = true) {
+            const container = document.getElementById('dialogContainer');
+            
+            // 检查是否已存在相同状态的弹窗
+            if (activeDialogs[statusType] && document.getElementById(activeDialogs[statusType])) {
+                const existingDialog = document.getElementById(activeDialogs[statusType]);
+                existingDialog.style.display = 'flex';
+                
+                document.querySelectorAll('.status-dialog').forEach(d => {
+                    d.classList.remove('active-dialog');
+                });
+                
+                existingDialog.classList.add('active-dialog');
+                existingDialog.style.zIndex = 2100 + Math.floor(Math.random() * 100);
+                existingDialog.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                return existingDialog;
+            }
+            
+            if (activeDialogs[statusType]) {
+                activeDialogs[statusType] = null;
+            }
+            
+            const dialogId = 'dialog_' + statusType + '_' + Date.now();
+            const dialog = document.createElement('div');
+            dialog.className = 'status-dialog active-dialog';
+            dialog.id = dialogId;
+            dialog.style.top = (100 + Math.random() * 50) + 'px';
+            dialog.style.left = (100 + Math.random() * 50) + 'px';
+            dialog.style.width = '400px';
+            dialog.style.height = '450px';
+            dialog.setAttribute('data-status', statusType);
+            
+            document.querySelectorAll('.status-dialog').forEach(d => {
+                d.classList.remove('active-dialog');
+            });
+            
+            const header = document.createElement('div');
+            header.className = 'dialog-header';
+            header.innerHTML = `
+                <span class="dialog-title">
+                    <i class="fas ${statusType === 'updated' ? 'fa-sync-alt' : statusType === 'new' ? 'fa-plus-circle' : statusType === 'moved' ? 'fa-arrows-alt' : 'fa-trash-alt'}"></i>
+                    ${title} (${items.length})
+                </span>
+                <button class="dialog-close" aria-label="关闭"><i class="fas fa-times"></i></button>
+            `;
+            
+            const content = document.createElement('div');
+            content.className = 'dialog-content';
+            content.style.overflowY = 'auto';
+            content.style.overflowX = 'hidden';
+            content.style.flex = '1 1 auto';
+            content.style.minHeight = '0';
+            
+            items.forEach(mod => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'dialog-item';
+                
+                if (canJump && statusType !== 'deleted') {
+                    itemDiv.style.cursor = 'pointer';
+                    itemDiv.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const rows = document.querySelectorAll('#modsTableBody tr');
+                        for (let row of rows) {
+                            const nameCell = row.cells[1];
+                            if (nameCell && nameCell.textContent.trim() === mod.name) {
+                                row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                row.style.transition = 'background 0.3s';
+                                row.style.background = 'rgba(255,149,0,0.3)';
+                                setTimeout(() => row.style.background = '', 800);
+                                break;
+                            }
+                        }
+                    });
+                } else if (statusType === 'deleted') {
+                    itemDiv.style.cursor = 'default';
+                }
+                
+                itemDiv.innerHTML = `<div class="mod-name">${mod.name}</div><div style="font-size:12px; opacity:0.8;">${mod.fileName}</div>`;
+                content.appendChild(itemDiv);
+            });
+            
+            const resizeHandle = document.createElement('div');
+            resizeHandle.className = 'dialog-resize-handle';
+            
+            dialog.appendChild(header);
+            dialog.appendChild(content);
+            dialog.appendChild(resizeHandle);
+            container.appendChild(dialog);
+            
+            activeDialogs[statusType] = dialogId;
+            
+            const closeBtn = header.querySelector('.dialog-close');
+            closeBtn.addEventListener('click', () => {
+                dialog.remove();
+                activeDialogs[statusType] = null;
+            });
+            
+            // 拖拽逻辑
+            let offsetX, offsetY, isDragging = false;
+            header.addEventListener('mousedown', (e) => {
+                if (e.button !== 0) return;
+                e.preventDefault();
+                isDragging = true;
+                
+                document.querySelectorAll('.status-dialog').forEach(d => {
+                    d.classList.remove('active-dialog');
+                });
+                dialog.classList.add('active-dialog');
+                dialog.style.zIndex = 2100 + Math.floor(Math.random() * 100);
+                
+                const rect = dialog.getBoundingClientRect();
+                offsetX = e.clientX - rect.left;
+                offsetY = e.clientY - rect.top;
+                
+                const onMouseMove = (moveEvent) => {
+                    if (!isDragging) return;
+                    moveEvent.preventDefault();
+                    let newLeft = moveEvent.clientX - offsetX;
+                    let newTop = moveEvent.clientY - offsetY;
+                    newLeft = Math.max(0, Math.min(window.innerWidth - dialog.offsetWidth, newLeft));
+                    newTop = Math.max(0, Math.min(window.innerHeight - dialog.offsetHeight, newTop));
+                    dialog.style.left = newLeft + 'px';
+                    dialog.style.top = newTop + 'px';
+                };
+                
+                const onMouseUp = () => {
+                    isDragging = false;
+                    window.removeEventListener('mousemove', onMouseMove);
+                    window.removeEventListener('mouseup', onMouseUp);
+                };
+                
+                window.addEventListener('mousemove', onMouseMove);
+                window.addEventListener('mouseup', onMouseUp);
+            });
+            
+            resizeHandle.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                document.querySelectorAll('.status-dialog').forEach(d => {
+                    d.classList.remove('active-dialog');
+                });
+                dialog.classList.add('active-dialog');
+                dialog.style.zIndex = 2100 + Math.floor(Math.random() * 100);
+                
+                const startX = e.clientX;
+                const startY = e.clientY;
+                const startWidth = dialog.offsetWidth;
+                const startHeight = dialog.offsetHeight;
+                
+                const onMouseMove = (moveEvent) => {
+                    const deltaX = moveEvent.clientX - startX;
+                    const deltaY = moveEvent.clientY - startY;
+                    const newWidth = Math.max(300, startWidth + deltaX);
+                    const newHeight = Math.max(350, startHeight + deltaY);
+                    dialog.style.width = newWidth + 'px';
+                    dialog.style.height = newHeight + 'px';
+                };
+                
+                const onMouseUp = () => {
+                    window.removeEventListener('mousemove', onMouseMove);
+                    window.removeEventListener('mouseup', onMouseUp);
+                };
+                
+                window.addEventListener('mousemove', onMouseMove);
+                window.addEventListener('mouseup', onMouseUp);
+            });
+            
+            header.addEventListener('click', function(e) {
+                if (e.target.closest('.dialog-close')) return;
+                document.querySelectorAll('.status-dialog').forEach(d => {
+                    d.classList.remove('active-dialog');
+                });
+                dialog.classList.add('active-dialog');
+                dialog.style.zIndex = 2100 + Math.floor(Math.random() * 100);
+            });
+            
+            return dialog;
+        }
+
+        // 统计按钮筛选功能
         function setupStatsFilter() {
             const statButtons = document.querySelectorAll('.stat-btn');
             
             statButtons.forEach(btn => {
                 btn.addEventListener('click', function(e) {
-                    // 移除其他按钮的active类
                     statButtons.forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
                     
-                    // 根据按钮确定状态类型
                     let statusType = '';
                     if (this.id === 'totalModsBtn') {
                         currentFilter = 'all';
                         renderModsTable();
-                        return; // 全部模组不弹窗，仅筛选
+                        return;
                     } else if (this.id === 'updatedModsBtn') {
                         statusType = 'updated';
                     } else if (this.id === 'newModsBtn') {
@@ -5843,21 +6340,18 @@ document.onkeydown = function(e) {
                         statusType = 'deleted';
                     }
                     
-                    // 获取对应状态的模组列表
                     const filteredMods = modsData.filter(mod => mod.status.includes(statusType));
                     if (filteredMods.length === 0) {
                         alert(translations[currentLanguage][statusType] + ' 模组列表为空');
                         return;
                     }
                     
-                    // 状态对应的标题
                     let title = '';
                     if (statusType === 'updated') title = translations[currentLanguage].updated;
                     else if (statusType === 'new') title = translations[currentLanguage].new;
                     else if (statusType === 'moved') title = translations[currentLanguage].moved;
                     else if (statusType === 'deleted') title = translations[currentLanguage].deleted;
                     
-                    // 弹窗 (删除状态不可跳转)
                     const canJump = (statusType !== 'deleted');
                     createStatusDialog(title + ' 模组', statusType, filteredMods, canJump);
                 });
@@ -5875,14 +6369,9 @@ document.onkeydown = function(e) {
         function handleDownload(modId) {
             const mod = modsData.find(m => m.id === modId);
             if (mod) {
-                // 增加下载计数
                 downloadStats[modId] = (downloadStats[modId] || 0) + 1;
                 saveDownloadStats();
-                
-                // 打开下载链接
                 window.open(mod.downloadUrl, '_blank');
-                
-                // 重新渲染表格以更新下载计数
                 renderModsTable();
             }
         }
@@ -5894,7 +6383,6 @@ document.onkeydown = function(e) {
             const archiveDropdown = document.getElementById('archiveDropdown');
             const sortMapDropdown = document.getElementById('sortMapDropdown');
             
-            // 免排序存档下拉菜单
             archiveDropdownBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 
@@ -5909,7 +6397,6 @@ document.onkeydown = function(e) {
                 }
             });
             
-            // 排序图下拉菜单
             sortMapDropdownBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 
@@ -5924,7 +6411,6 @@ document.onkeydown = function(e) {
                 }
             });
             
-            // 下拉菜单项点击事件
             const dropdownLinks = document.querySelectorAll('.dropdown-content a');
             dropdownLinks.forEach(link => {
                 link.addEventListener('click', function(e) {
